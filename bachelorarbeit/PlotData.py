@@ -140,14 +140,20 @@ meas = util.structToArray(data2,'genBQuark1_e')
 # plt.plot(grids[0])
 # plt.savefig(PATHTOPLOTS + 'chi2plot1.png')
 
-sigma = util.structToArray(data2,'chi2sigma')
-befit = util.structToArray(data2,'chi2mins')
+be1fit = util.structToArray(data2,'fitbjet1_e')
+be2fit = util.structToArray(data2,'fitbjet2_e')
+
 be1 = util.structToArray(data2,'bjet1_e')
 pt1 = util.structToArray(data2,'bjet1_pt')
 eta1 = util.structToArray(data2,'bjet1_eta')
+be2 = util.structToArray(data2,'bjet2_e')
+be1gen = util.structToArray(data2,'genBQuark1_e')
+be2gen = util.structToArray(data2,'genBQuark2_e')
+fac = util.structToArray(data2,'bie_to_bje')
 
 
-chi2sigma = util.structToArray(data2,'chi2sigma')
+
+chi2sigma = util.structToArray(data2,'fitbjet1_esigma')
 
 chi2val = util.structToArray(data2,'chi2val')
 indexchi2Smaller0d5 = np.where(chi2val<0.5)[0]
@@ -158,7 +164,7 @@ indexchi2Smaller10 = np.where(chi2val<10)[0]
 
 
 
-pullFit = (befit-meas)/meas
+pullFit = (be1fit-meas)/meas
 pullOriginal = (be1 - meas)/meas
 
 pullFitComp0d5 = (np.take(pullFit,indexchi2Smaller0d5),r"$\chi^2 < 0.5$ ")
@@ -211,5 +217,57 @@ mdeComp0d5 = (np.take(mde,indexchi2Smaller0d5),r"$\chi^2 < 0.5$ ")
 mdeComp2d5 = (np.take(mde,indexchi2Smaller2d5),r"$\chi^2 < 2.5$ ")
 mdeComp10 = (np.take(mde,indexchi2Smaller10),r"$\chi^2 < 10$ ")
 plotting.plotHist(mde, PATHTOPLOTSDATVAL,r"$\frac{\sqrt{p_{TB1}^2-E_{B1}^2}}{E_{B1}}$", r"Masse Verteilung",[0,1],200,mdeComp0d5, mdeComp2d5, mdeComp10, ylim=[1,1000], density=False , yLabel=r"Amount", yscale='log')
+
+sfac = np.sqrt(fac)
+
+be1fitdfac = be1fit/sfac
+be2fitdfac = be2fit/sfac
+
+be1dfac = be1/sfac
+be2dfac = be2/sfac
+be1gendfac = be1gen/sfac
+be2gendfac = be2gen/sfac
+
+
+
+be1dfacComp0d5 = np.take(be1dfac,indexchi2Smaller0d5)
+be1dfacComp2d5 = np.take(be1dfac,indexchi2Smaller2d5)
+be1dfacComp10 = np.take(be1dfac,indexchi2Smaller10)
+
+be2dfacComp0d5 = np.take(be2dfac,indexchi2Smaller0d5)
+be2dfacComp2d5 = np.take(be2dfac,indexchi2Smaller2d5)
+be2dfacComp10 = np.take(be2dfac,indexchi2Smaller10)
+
+be1gendfacComp0d5 = np.take(be1gendfac,indexchi2Smaller0d5)
+be1gendfacComp2d5 = np.take(be1gendfac,indexchi2Smaller2d5)
+be1gendfacComp10 = np.take(be1gendfac,indexchi2Smaller10)
+
+be2gendfacComp0d5 = np.take(be2gendfac,indexchi2Smaller0d5)
+be2gendfacComp2d5 = np.take(be2gendfac,indexchi2Smaller2d5)
+be2gendfacComp10 = np.take(be2gendfac,indexchi2Smaller10)
+
+
+t = np.linspace(1,10,30)
+
+fx = 1/t
+fy = 1/fx
+
+fxx = np.append(fy,fx)
+fyy = np.append(fx,fy)
+f = [fxx,fyy]
+
+plotting.plot1v2hist(be1fitdfac,be2fitdfac, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{fit}}{f}$",r"$\frac{E_{B2}^{fit}}{f}$",r" $E_{B2}^{fit}$ vs $ E_{B2}^{fit}$ ", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha)})}}$",'SanityCheck')
+
+
+plotting.plot1v2hist(be1dfac,be2dfac, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ ", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(alpha)})}}$",'BE1vsBE2')
+plotting.plot1v2hist(be1dfacComp0d5,be2dfacComp0d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100,r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ for $\chi^2 < 0.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'BE1vsBE2Chi2smaller0d5')
+plotting.plot1v2hist(be1dfacComp2d5,be2dfacComp2d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ for $\chi^2 < 2.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'BE1vsBE2Chi2smaller2d5')
+plotting.plot1v2hist(be1dfacComp10,be2dfacComp10, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100,  r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ for $\chi^2 < 10$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'BE1vsBE2Chi2smaller10')
+
+plotting.plot1v2hist(be1gendfac,be2gendfac, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ ", PATHTOPLOTSDATVAL, r" $f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(alpha)})}}$",'genBE1vsBE2')
+plotting.plot1v2hist(be1gendfacComp0d5,be2gendfacComp0d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ for $\chi^2 < 0.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'genBE1vsBE2Chi2smaller0d5')
+plotting.plot1v2hist(be1gendfacComp2d5,be2gendfacComp2d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ for $\chi^2 < 2.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'genBE1vsBE2Chi2smaller2d5')
+plotting.plot1v2hist(be1gendfacComp10,be2gendfacComp10, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ for $\chi^2 < 10$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'genBE1vsBE2Chi2smaller10')
+
 
 

@@ -36,6 +36,7 @@ BE1_mes = util.structToArray(events,'bjet1_e')
 BE2_mes = util.structToArray(events,'bjet2_e') 
 BE1sigma = util.structToArray(events, 'bjet1_sigma')
 BE2sigma = util.structToArray(events, 'bjet2_sigma')
+fac = util.structToArray(events,'bie_to_bje')
 
 sigmaFits = []
 evaluationAxisArr = []
@@ -112,9 +113,10 @@ print(np.average(minpos),np.std(minpos))
 print(chi2[0].shape)
 
 util.updateDataSet(DATAPATH,'chi2',chi2str)
-util.updateDataSet(DATAPATH,'chi2mins', mins)
+util.updateDataSet(DATAPATH,'fitbjet1_e', mins)
+util.updateDataSet(DATAPATH,'fitbjet2_e',fac/mins)
 util.updateDataSet(DATAPATH,'chi2val', minvalues)
-util.updateDataSet(DATAPATH,'chi2sigma',sigmaFits)
+util.updateDataSet(DATAPATH,'fitbjet1_esigma',sigmaFits)
 
 
 

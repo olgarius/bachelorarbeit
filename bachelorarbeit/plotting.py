@@ -123,6 +123,8 @@ def plotHist(x, path, xLabel, title, xlim, bins,*xcompare, yLabel= r"Normalized 
     std = np.std(x)
 
     plt.rcParams["text.usetex"] = True
+    # plt.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}'
+
 
 
     plt.hist(x,bins,range=tuple(xlim),density=density, label=r"default "+  r"$\mu = $" + str(round(mean,2)) + r" $\sigma = $" + str(round(std,2)))
@@ -166,6 +168,38 @@ def plotHist(x, path, xLabel, title, xlim, bins,*xcompare, yLabel= r"Normalized 
         title =alttitle
 
     plt.savefig(path + title)
+    plt.rcParams["text.usetex"] = False
+
+def plot1v2hist(x,y, expectedxy, expectedlabel, xlim, ylim, bins, xlabel, ylabel, title, savepath, suptitle= None, alttitle = None):
+    fig,ax  = plt.subplots(figsize = (10,10))
+    
+    plt.rcParams["text.usetex"] = True
+    # plt.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}'
+
+    h,xb,yb = np.histogram2d(x,y,bins=bins,range=[xlim,ylim])
+    hep.hist2dplot(h,xb,yb,norm=mcolor.LogNorm())
+ 
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xlim(xlim)
+    plt.ylim(ylim)  
+
+    plt.scatter(*expectedxy, c='r', marker='x', s=4)
+    plt.legend([expectedlabel], fontsize= 'xx-small')
+    plt.title(title, fontsize = 30)
+    ax.set_box_aspect(1)
+
+
+    if suptitle is not None:
+        plt.text((xlim[0]+xlim[1])/2, 0.9*ylim[1], suptitle  ,fontsize = 25,horizontalalignment='center')
+
+    plt.tight_layout()
+
+    if alttitle is not None:
+        title = alttitle
+
+    plt.savefig(savepath + title + '.png')
+
     plt.rcParams["text.usetex"] = False
 
 
