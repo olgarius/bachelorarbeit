@@ -1,14 +1,5 @@
 import numpy as np
 
-
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolor
-import mplhep as hep
-
-
-
-
-
 class losTerm:
     def __init__(self, yMeas, sigma):
         self.yMeas = yMeas

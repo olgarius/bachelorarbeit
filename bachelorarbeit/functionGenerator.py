@@ -1,7 +1,4 @@
-import numpy as np
-
-import util as u
-import functions as f
+import mathutil as u
 
 HMASS = 125.25
 

@@ -1,8 +1,7 @@
 import grid
 import functionGenerator
-import util 
-import functions
-import plotting
+import mathutil 
+import structutil as su
 
 import matplotlib.pyplot as plt
 
@@ -10,14 +9,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.optimize as sopt
 
-from pathlib import Path
 
-DATAPATH = Path('/nfs/dust/cms/user/lukastim/bachelor/data/DataSet.npy')
-
+from PATHS import WORKINGDATAPATH
 
 
 #load data and select relevant data
-events = np.load(DATAPATH)
+events = np.load(WORKINGDATAPATH)
 # events = data['events']
 
 unitAxis = [np.linspace(0,1,100),np.linspace(0,1,100)]
@@ -32,11 +29,11 @@ mins = []
 sigmaFits = []
 minpos = []
 
-BE1_mes = util.structToArray(events,'bjet1_e') 
-BE2_mes = util.structToArray(events,'bjet2_e') 
-BE1sigma = util.structToArray(events, 'bjet1_sigma')
-BE2sigma = util.structToArray(events, 'bjet2_sigma')
-fac = util.structToArray(events,'bie_to_bje')
+BE1_mes = su.structToArray(events,'bjet1_e') 
+BE2_mes = su.structToArray(events,'bjet2_e') 
+BE1sigma = su.structToArray(events, 'bjet1_sigma')
+BE2sigma = su.structToArray(events, 'bjet2_sigma')
+fac = su.structToArray(events,'bie_to_bje')
 
 sigmaFits = []
 evaluationAxisArr = []
@@ -59,7 +56,7 @@ for i, n in enumerate(be1functions):
 
 
     # evaluationAxis = util.axisValueTransformToMu(unitAxis[0],BE1_mes[i],BE1sigma[i],6)
-    evaluationAxis = util.axisValueTransformToMu1Mu2(unitAxis[0],BE1_mes[i], BE2_mes[i], BE1sigma[i], BE1sigma[i],be2fitfunctions[i],3)
+    evaluationAxis = mathutil.axisValueTransformToMu1Mu2(unitAxis[0],BE1_mes[i], BE2_mes[i], BE1sigma[i], BE1sigma[i],be2fitfunctions[i],3)
     # evaluationAxis = unitAxis[0]*300
     evaluationAxisArr.append(evaluationAxis)
 
@@ -107,38 +104,45 @@ for i, n in enumerate(be1functions):
 
 print('Negative sigma percentage: ',counterNegSigma/len(be1functions)*100, '%')
 print('Out of bounds min percentage: ',counterEdge/len(be1functions)*100, '%')
+print('Chi2 > 3.84 percentage: ',len(np.where(np.array(minvalues) > 3.84))/len(minvalues)*100, '%')
+
 print(np.average(minpos),np.std(minpos))
 # print(min(minpos),max(minpos))
 
-print(chi2[0].shape)
-
-util.updateDataSet(DATAPATH,'chi2',chi2str)
-util.updateDataSet(DATAPATH,'fitbjet1_e', mins)
-util.updateDataSet(DATAPATH,'fitbjet2_e',fac/mins)
-util.updateDataSet(DATAPATH,'chi2val', minvalues)
-util.updateDataSet(DATAPATH,'fitbjet1_esigma',sigmaFits)
 
 
+su.updateDataSet(WORKINGDATAPATH,'chi2',chi2str)
+su.updateDataSet(WORKINGDATAPATH,'fitbjet1_e', mins)
+su.updateDataSet(WORKINGDATAPATH,'fitbjet2_e',fac/mins)
+su.updateDataSet(WORKINGDATAPATH,'chi2val', minvalues)
+su.updateDataSet(WORKINGDATAPATH,'fitbjet1_esigma',sigmaFits)
+
+print('EP indices: ',edgeProblemIndex)
+
+
+
+if len(edgeProblemIndex) > 1:
+    fig = plt.figure()
+
+    plt.scatter(evaluationAxisArr[edgeProblemIndex[0]],chi2[edgeProblemIndex[0]])
+
+
+
+    plt.savefig('./TESTEP.png')
+
+    fig = plt.figure()
+
+    plt.scatter(evaluationAxisArr[edgeProblemIndex[1]],chi2[edgeProblemIndex[1]])
+    plt.savefig('./TESTEP1.png')
 
 fig = plt.figure()
 
-plt.scatter(evaluationAxisArr[edgeProblemIndex[0]],chi2[edgeProblemIndex[0]])
-
-
-
-plt.savefig('./TESTEP.png')
-
-fig = plt.figure()
-
-plt.scatter(evaluationAxisArr[edgeProblemIndex[1]],chi2[edgeProblemIndex[1]])
-plt.savefig('./TESTEP1.png')
-
-fig = plt.figure()
 
 plt.scatter(evaluationAxisArr[0],chi2[0])
 plt.savefig('./TEST2.png')
 
 fig = plt.figure()
 
-plt.scatter(evaluationAxisArr[highminvalueIndex[0]],chi2[highminvalueIndex[0]])
-plt.savefig('./TESTHM1.png')
+if len(highminvalueIndex) > 1:
+    plt.scatter(evaluationAxisArr[highminvalueIndex[0]],chi2[highminvalueIndex[0]])
+    plt.savefig('./TESTHM1.png')

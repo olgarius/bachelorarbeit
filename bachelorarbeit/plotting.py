@@ -1,7 +1,5 @@
 import numpy as np
 
-
-
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolor
 import mplhep as hep
@@ -170,15 +168,19 @@ def plotHist(x, path, xLabel, title, xlim, bins,*xcompare, yLabel= r"Normalized 
     plt.savefig(path + title)
     plt.rcParams["text.usetex"] = False
 
-def plot1v2hist(x,y, expectedxy, expectedlabel, xlim, ylim, bins, xlabel, ylabel, title, savepath, suptitle= None, alttitle = None):
+def plot1v2hist(x,y, expectedxy, expectedlabel, xlim, ylim, bins, xlabel, ylabel, title, savepath, suptitle= None, alttitle = None, scale = 'log'):
     fig,ax  = plt.subplots(figsize = (10,10))
     
     plt.rcParams["text.usetex"] = True
     # plt.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}'
 
     h,xb,yb = np.histogram2d(x,y,bins=bins,range=[xlim,ylim])
-    hep.hist2dplot(h,xb,yb,norm=mcolor.LogNorm())
- 
+    if scale is 'log':
+        hep.hist2dplot(h,xb,yb,norm=mcolor.LogNorm())
+    else:
+        hep.hist2dplot(h,xb,yb)
+        
+
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.xlim(xlim)
