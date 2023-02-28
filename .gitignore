@@ -6,5 +6,14 @@
 /taglist.py
 /taglist.txt
 /taglist2.txt
+bachelorarbeit/__pycache__
 
 **/*.png
+*.png
+
+bachelorarbeit/Fehlerellipse.py
+bachelorarbeit/EventValidation.py
+
+bachelorarbeit/IPython.py
+bachelorarbeit/tests/nptests.py
+bachelorarbeit/tests/test.py
