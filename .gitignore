@@ -17,3 +17,4 @@ bachelorarbeit/EventValidation.py
 bachelorarbeit/IPython.py
 bachelorarbeit/tests/nptests.py
 bachelorarbeit/tests/test.py
+bachelorarbeit/deltaRvalidation.py

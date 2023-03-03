@@ -1,5 +1,5 @@
 
-RAWDATAPATH = '/nfs/dust/cms/user/kramerto/hbt_resonant_run2/HHSkims/SKIMS_uhh_2017_v2_forTim/SKIM_ggF_BulkGraviton_m300/'
+RAWDATAPATH = '/nfs/dust/cms/user/kramerto/hbt_resonant_run2/HHSkims/SKIMS_uhh_2017_v2_forTim/SKIM_GGHH_SM/'
 WORKINGDATAPATH = '/nfs/dust/cms/user/lukastim/bachelor/data/DataSet.npy'
 
 
