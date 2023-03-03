@@ -4,6 +4,7 @@ import mathutil
 import structutil as su
 
 import matplotlib.pyplot as plt
+import json
 
 
 import numpy as np
@@ -34,9 +35,12 @@ BE2_mes = su.structToArray(events,'bjet2_e')
 BE1sigma = su.structToArray(events, 'bjet1_sigma')
 BE2sigma = su.structToArray(events, 'bjet2_sigma')
 fac = su.structToArray(events,'bie_to_bje')
+indices = su.structToArray(events, 'index')
 
 sigmaFits = []
 evaluationAxisArr = []
+evaluationAxisArrstr = []
+
 counterNegSigma = 0
 
 counterEdge = 0 
@@ -51,6 +55,8 @@ highminvalue =[]
 highminvalueAxis =[]
 highminvalueIndex = []
 
+chi2dicts = [] 
+
 for i, n in enumerate(be1functions):
 
 
@@ -59,6 +65,8 @@ for i, n in enumerate(be1functions):
     evaluationAxis = mathutil.axisValueTransformToMu1Mu2(unitAxis[0],BE1_mes[i], BE2_mes[i], BE1sigma[i], BE1sigma[i],be2fitfunctions[i],3)
     # evaluationAxis = unitAxis[0]*300
     evaluationAxisArr.append(evaluationAxis)
+    evaluationAxisArrstr.append(json.dumps(evaluationAxis.tolist()))
+    
 
     g = grid.grid()
     g.addDimension(evaluationAxis)
@@ -79,7 +87,8 @@ for i, n in enumerate(be1functions):
 
 
     chi2.append(g.evaluated)
-    chi2str.append(str(g.evaluated))
+    chi2s = g.evaluated
+    chi2str.append(json.dumps(chi2s.tolist()))
     mins.append(m[0])
 
     minvalue = np.min(g.evaluated)
@@ -102,6 +111,9 @@ for i, n in enumerate(be1functions):
 
     sigmaFits.append(sigmaFit)
 
+    chi2dict = {'index' : indices[i], 'xAxis' :  evaluationAxis.tolist(), 'values' : g.evaluated.tolist()}
+    chi2dicts.append(json.dumps(chi2dict))
+
 print('Negative sigma percentage: ',counterNegSigma/len(be1functions)*100, '%')
 print('Out of bounds min percentage: ',counterEdge/len(be1functions)*100, '%')
 print('Chi2 > 3.84 percentage: ',len(np.where(np.array(minvalues) > 3.84))/len(minvalues)*100, '%')
@@ -111,11 +123,14 @@ print(np.average(minpos),np.std(minpos))
 
 
 
-su.updateDataSet(WORKINGDATAPATH,'chi2',chi2str)
+# su.updateDataSetWithFloatArray(WORKINGDATAPATH,'chi2',chi2)
+# su.updateDataSetWithFloatArray(WORKINGDATAPATH,'ax1Values',evaluationAxisArr)
 su.updateDataSet(WORKINGDATAPATH,'fitbjet1_e', mins)
 su.updateDataSet(WORKINGDATAPATH,'fitbjet2_e',fac/mins)
 su.updateDataSet(WORKINGDATAPATH,'chi2val', minvalues)
 su.updateDataSet(WORKINGDATAPATH,'fitbjet1_esigma',sigmaFits)
+su.updateDataSet(WORKINGDATAPATH, 'chi2dict', chi2dicts)
+
 
 print('EP indices: ',edgeProblemIndex)
 
@@ -136,6 +151,8 @@ if len(edgeProblemIndex) > 1:
     plt.savefig('./TESTEP1.png')
 
 fig = plt.figure()
+
+
 
 
 plt.scatter(evaluationAxisArr[0],chi2[0])
