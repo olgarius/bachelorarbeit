@@ -1,7 +1,7 @@
 import numpy as np
 from pathlib import Path
 
-import util
+import mathutil
 
 DATAPATH = Path('/nfs/dust/cms/user/kramerto/hbt_resonant_run2/HHSkims/SKIMS_uhh_2017_v2_31Aug22/SKIM_ggF_BulkGraviton_m300/output0.npz')
 data1= np.load(DATAPATH)
@@ -45,14 +45,14 @@ def apply_delta_r_selection(var1, var2):
 
 
 
-bjet1_eta =  util.structToArray(data,'bjet1_eta')
-m_genB1_eta =  util.structToArray(data,'genBQuark1_eta')
-bjet2_eta =  util.structToArray(data,'bjet2_eta')
-m_genB2_eta =  util.structToArray(data,'genBQuark2_eta')
-bjet1_phi =  util.structToArray(data,'bjet1_phi')
-m_genB1_phi =  util.structToArray(data,'genBQuark1_phi')
-bjet2_phi =  util.structToArray(data,'bjet2_phi')
-m_genB2_phi =  util.structToArray(data,'genBQuark2_phi')
+bjet1_eta =  mathutil.structToArray(data,'bjet1_eta')
+m_genB1_eta =  mathutil.structToArray(data,'genBQuark1_eta')
+bjet2_eta =  mathutil.structToArray(data,'bjet2_eta')
+m_genB2_eta =  mathutil.structToArray(data,'genBQuark2_eta')
+bjet1_phi =  mathutil.structToArray(data,'bjet1_phi')
+m_genB1_phi =  mathutil.structToArray(data,'genBQuark1_phi')
+bjet2_phi =  mathutil.structToArray(data,'bjet2_phi')
+m_genB2_phi =  mathutil.structToArray(data,'genBQuark2_phi')
 
 
 deltaR_det1_gen1 = deltaR(eta1=bjet1_eta, phi1=bjet1_phi, eta2 = m_genB1_eta, phi2 = m_genB1_phi)

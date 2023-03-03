@@ -1,7 +1,6 @@
 import numpy as np
-import grid
-import bachelorarbeit.alt.grid_copy as grid_copy
-import util as u
+import bachelorarbeit.grid as grid
+import bachelorarbeit.mathutil as u
 import plotting
 
 import multiprocessing as mp

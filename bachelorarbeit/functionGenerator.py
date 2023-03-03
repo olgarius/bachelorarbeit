@@ -1,13 +1,14 @@
 import mathutil as u
+import structutil as su
 
 HMASS = 125.25
 
 
 
 def getBBE2Chi2(data):
-    BE2_mes = u.structToArray(data,'bjet2_e') 
-    fac = u.structToArray(data,'bie_to_bje')
-    sigma = u.structToArray(data, 'bjet2_sigma') * BE2_mes
+    BE2_mes = su.structToArray(data,'bjet2_e') 
+    fac = su.structToArray(data,'bie_to_bje')
+    sigma = su.structToArray(data, 'bjet2_sigma') * BE2_mes
 
     farray = []
     farray2 = []
@@ -30,8 +31,8 @@ def genBBE2Chi2(BE2_mes,fac,sigma):
     return BE2Chi2,BE2_fit
 
 def getBBE1Chi2(data):
-    BE1_mes = u.structToArray(data,'bjet1_e')
-    sigma = u.structToArray(data, 'bjet1_sigma') * BE1_mes
+    BE1_mes = su.structToArray(data,'bjet1_e')
+    sigma = su.structToArray(data, 'bjet1_sigma') * BE1_mes
 
     farray = []
 
