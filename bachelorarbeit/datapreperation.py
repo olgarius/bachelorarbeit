@@ -13,14 +13,18 @@ from PATHS import RAWDATAPATH
 relevantKeys = ['bjet2_e','bjet1_e','bjet2_eta','bjet2_phi','bjet1_eta','bjet1_phi','bjet2_pt','bjet1_pt','genBQuark2_e','genBQuark1_e','genBQuark2_eta','genBQuark2_phi','genBQuark1_eta','genBQuark1_phi','genBQuark2_pt','genBQuark1_pt','rho','nbjetscand','bjet1_btag_deepFlavor','bjet2_btag_deepFlavor']
 
 
-files = glob(RAWDATAPATH+'*.npz')
+# files = glob(RAWDATAPATH+'*.npz')
 
-for i,f in enumerate(files):
-    data = np.load(f)
-    if i is 0:
-        events = data['events']
-    else:
-        events = np.append(events,data['events'])
+# for i,f in enumerate(files):
+#     data = np.load(f)
+#     if i is 0:
+#         events = data['events']
+#     else:
+#         events = np.append(events,data['events'])
+
+path = RAWDATAPATH + 'tet.npz'
+
+events =  np.load(path)['events']
 
 print(len(events))
 
@@ -28,35 +32,46 @@ relevantData = events[relevantKeys]
 
 repackedData = rf.repack_fields(relevantData)
 
-new_bjet1e, new_bjet2e, new_bjet1pt, new_bjet2pt, new_bjet1phi, new_bjet2phi, new_bjet1eta, new_bjet2eta, notusabeleEvents = du.matchBjets(repackedData,'bjet1_e','bjet2_e','bjet1_pt','bjet2_pt','bjet1_phi','bjet2_phi','genBQuark1_phi','genBQuark2_phi','bjet1_eta','bjet2_eta','genBQuark1_eta','genBQuark2_eta',)
+indexarray = np.linspace(0,len(relevantData)-1,len(relevantData))
 
-dataSet = su.updateStructArray(repackedData, 'bjet1_e', new_bjet1e)
-dataSet = su.updateStructArray(dataSet, 'bjet2_e', new_bjet2e)
-dataSet = su.updateStructArray(dataSet, 'bjet1_pt', new_bjet1pt)
-dataSet = su.updateStructArray(dataSet, 'bjet2_pt', new_bjet2pt)
-dataSet = su.updateStructArray(dataSet, 'bjet1_phi', new_bjet1phi)
-dataSet = su.updateStructArray(dataSet, 'bjet2_phi', new_bjet2phi)
-dataSet = su.updateStructArray(dataSet, 'bjet1_eta', new_bjet1eta)
-dataSet = su.updateStructArray(dataSet, 'bjet2_eta', new_bjet2eta)
+repackedData = su.updateStructArray(repackedData, 'index', indexarray)
+
+# new_bjet1e, new_bjet2e, new_bjet1pt, new_bjet2pt, new_bjet1phi, new_bjet2phi, new_bjet1eta, new_bjet2eta, notuseableEvents1 = du.matchBjets(repackedData,'bjet1_e','bjet2_e','bjet1_pt','bjet2_pt','bjet1_phi','bjet2_phi','genBQuark1_phi','genBQuark2_phi','bjet1_eta','bjet2_eta','genBQuark1_eta','genBQuark2_eta',)
+
+# dataSet = su.updateStructArray(repackedData, 'bjet1_e', new_bjet1e)
+# dataSet = su.updateStructArray(dataSet, 'bjet2_e', new_bjet2e)
+# dataSet = su.updateStructArray(dataSet, 'bjet1_pt', new_bjet1pt)
+# dataSet = su.updateStructArray(dataSet, 'bjet2_pt', new_bjet2pt)
+# dataSet = su.updateStructArray(dataSet, 'bjet1_phi', new_bjet1phi)
+# dataSet = su.updateStructArray(dataSet, 'bjet2_phi', new_bjet2phi)
+# dataSet = su.updateStructArray(dataSet, 'bjet1_eta', new_bjet1eta)
+# dataSet = su.updateStructArray(dataSet, 'bjet2_eta', new_bjet2eta)
 
 
-
-
-
-# notusabeleEvents += util.getIndexForCondition(dataSet, 'bjet1_pt', np.less, 15)
-# notusabeleEvents += util.getIndexForCondition(dataSet, 'bjet2_pt', np.less, 15)
-
-notusabeleEvents += su.getIndexForCondition(dataSet, 'genBQuark1_pt', np.less, 40)
-notusabeleEvents += su.getIndexForCondition(dataSet, 'genBQuark2_pt', np.less, 40)
-notusabeleEvents += su.getIndexForCondition(dataSet, 'nbjetscand', np.less, 1)
-notusabeleEvents += su.getIndexForCondition(dataSet, 'bjet1_btag_deepFlavor', np.less, 0.304)
-notusabeleEvents += su.getIndexForCondition(dataSet, 'bjet2_btag_deepFlavor', np.less, 0.304)
+BquarkSwitchList = (('bjet2_e','bjet1_e'),('bjet2_eta','bjet1_eta'),('bjet2_phi','bjet1_phi'),('bjet2_pt','bjet1_pt'),('bjet1_btag_deepFlavor','bjet2_btag_deepFlavor'))
+TauSwitchList = (('dau2_e','dau1_e'),('dau2_eta','dau1_eta'),('dau2_phi','dau1_phi'),('dau2_pt','dau1_pt'))
 
 
 
+dataSet, notuseableEvents = du.deltaRmatching(repackedData, 'bjet1_eta','bjet2_eta', 'bjet1_phi','bjet2_phi' ,'genBQuark1_eta','genBQuark2_eta', 'genBQuark1_phi','genBQuark2_phi', BquarkSwitchList )
 
-print('removed ', len(set(notusabeleEvents))/len(dataSet)*100, '%')
-dataSet = su.removeEvents(dataSet,notusabeleEvents)
+# print(set(notuseableEvents1) == set(notuseableEvents))
+
+
+# notuseableEvents += util.getIndexForCondition(dataSet, 'bjet1_pt', np.less, 15)
+# notuseableEvents += util.getIndexForCondition(dataSet, 'bjet2_pt', np.less, 15)
+
+notuseableEvents += su.getIndexForCondition(dataSet, 'genBQuark1_pt', np.less, 40)
+notuseableEvents += su.getIndexForCondition(dataSet, 'genBQuark2_pt', np.less, 40)
+notuseableEvents += su.getIndexForCondition(dataSet, 'nbjetscand', np.less, 1)
+notuseableEvents += su.getIndexForCondition(dataSet, 'bjet1_btag_deepFlavor', np.less, 0.304)
+notuseableEvents += su.getIndexForCondition(dataSet, 'bjet2_btag_deepFlavor', np.less, 0.304)
+
+
+
+
+print('removed ', len(set(notuseableEvents))/len(dataSet)*100, '%')
+dataSet = su.removeEvents(dataSet,notuseableEvents)
 
 
 

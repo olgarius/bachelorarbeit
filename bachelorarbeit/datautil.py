@@ -4,7 +4,7 @@ import numpy as np
 import structutil as su 
 import mathutil as mu
 
-DRT = 0.3
+DRT = 0.4
 
 def getFacs(events, bjet1_pt_key,bjet1_phi_key, bjet1_eta_key,bjet2_pt_key, bjet2_phi_key, bjet2_eta_key):
 
@@ -66,6 +66,7 @@ def singleBjetMatching(bjet1_eta,bjet2_eta,bjet1_phi,bjet2_phi, genB1_eta,genB2_
     delta22 = mu.dist(bjet2,b2)
     delta2s2 = mu.dist(bjet2shifted,b2)
     delta22s = mu.dist(bjet2,b2shifted)
+    
     delta12 = mu.dist(bjet1,b2)
     delta1s2 = mu.dist(bjet1shifted,b2)
     delta12s = mu.dist(bjet1,b2shifted)
@@ -112,13 +113,13 @@ def matchBjets(data, bjet1_e_key, bjet2_e_key, bjet1_pt_key, bjet2_pt_key, bjet1
 
     bjet1phi = data[bjet1_phi_key]
     bjet2phi = data[bjet2_phi_key]
-    genB2phi = data[genB1_phi_key]
-    genB1phi = data[genB2_phi_key]
+    genB1phi = data[genB1_phi_key]
+    genB2phi = data[genB2_phi_key]
 
     bjet1eta = data[bjet1_eta_key]
     bjet2eta = data[bjet2_eta_key]
-    genB2eta = data[genB1_eta_key]
-    genB1eta = data[genB2_eta_key]
+    genB1eta = data[genB1_eta_key]
+    genB2eta = data[genB2_eta_key]
 
     for i in range(len(bjet1e)):
         switch = singleBjetMatching(bjet1eta[i], bjet2eta[i], bjet1phi[i], bjet2phi[i], genB1eta[i], genB2eta[i], genB1phi[i], genB2phi[i])
@@ -165,6 +166,62 @@ def matchBjets(data, bjet1_e_key, bjet2_e_key, bjet1_pt_key, bjet2_pt_key, bjet1
             new_bjet2eta.append(bjet2eta[i])
 
     return np.array(new_bjet1e), np.array(new_bjet2e), np.array(new_bjet1pt), np.array(new_bjet2pt), np.array(new_bjet1phi), np.array(new_bjet2phi), np.array(new_bjet1eta), np.array(new_bjet2eta), notusabeleEvents
+
+def deltaR(v1, v2):
+    dPhi = abs(v1[1]-v2[1])
+    return np.sqrt((v1[0] - v2[0])**2 +  (np.minimum(dPhi, abs(2*np.pi - dPhi)))**2)
+
+def deltaRmask(eta1,eta2,phi1,phi2, gen_eta1,gen_eta2,gen_phi1,gen_phi2):
+    bjet1 = np.array([eta1,phi1])
+    bjet2 = np.array([eta2,phi2])
+    b1 = np.array([gen_eta1, gen_phi1])
+    b2 = np.array([gen_eta2, gen_phi2])
+
+    d11 = deltaR(bjet1,b1)
+    d12 = deltaR(bjet1,b2)
+    d21 = deltaR(bjet2,b1)
+    d22 = deltaR(bjet2,b2)
+
+    l = len(eta1)
+    out =  - np.ones(l)
+    ones = np.ones(l)
+    zeroes = np.zeros(l)
+
+    out = np.where(mu.multipleAnd(d11 < DRT, d22 < DRT, d12 > DRT, d21 > DRT), zeroes, out)
+    out = np.where(mu.multipleAnd(d11 > DRT, d22 > DRT, d12 < DRT, d21 < DRT), ones, out)
+
+    return out
+
+
+
+def deltaRmatching(structArray,eta1_key,eta2_key,phi1_key,phi2_key, gen_eta1_key,gen_eta2_key,gen_phi1_key,gen_phi2_key, keyPairList):
+    eta1 = structArray[eta1_key]
+    eta2 = structArray[eta2_key]
+    geneta1 = structArray[gen_eta1_key]
+    geneta2 = structArray[gen_eta2_key]
+
+    phi1 = structArray[phi1_key]
+    phi2 = structArray[phi2_key]
+    genphi1 = structArray[gen_phi1_key]
+    genphi2 = structArray[gen_phi2_key]
+
+    mask = deltaRmask(eta1,eta2,phi1,phi2,geneta1,geneta2,genphi1,genphi2)
+    
+
+    unuseableeEvents = np.where(mask == -1 )[0].tolist()
+    
+
+    for kp in keyPairList:
+        structArray =  su.switchEntries(structArray, kp[0],kp[1], mask)
+
+    return structArray, unuseableeEvents
+
+
+
+
+
+
+
 
 def readTable(path):
     with open(path, 'r') as f:
