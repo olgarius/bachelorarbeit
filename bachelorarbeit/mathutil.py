@@ -257,9 +257,20 @@ def multipleAnd(*x):
         out = np.logical_and(out,b)
     return out
 
+def inverse2x2(A):
+    det =  A[0][0]*A[1][1]-A[0][1]*A[1][0]
+    if det == 0:
+        return np.array([[np.nan, np.nan],[np.nan, np.nan]])
+
+    return np.array([
+        [A[1][1],-A[1][0]],
+        [-A[0][1],A[0][0]]]
+        )/det
 
 
-
+ 
+def vT_x_A_x_v(v,A):
+    return v.dot(A.dot(v))
 
 
       

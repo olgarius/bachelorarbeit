@@ -234,3 +234,5 @@ def readTable(path):
         f.close()
     return out
  
+def combineArrayToMatrixArray(a,b,c,d):
+    return np.dstack((np.c_[a,b], np.c_[c,d]))
