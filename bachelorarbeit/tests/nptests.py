@@ -297,6 +297,122 @@ from pathlib import Path
 # print(jsonarrstr)
 # print(json.loads(jsonarrstr))
 
-a = np.linspace(-5,5,10)
+# a = np.linspace(-5,5,10)
 
-print(np.logical_and(a>2, a <3) )
+# print(np.logical_and(a>2, a <3) )
+
+# RAWDATAPATH = '/nfs/dust/cms/user/kramerto/hbt_resonant_run2/HHSkims/SKIMS_uhh_2017_v2_forTim/SKIM_GGHH_SM/' 
+# data = np.load(RAWDATAPATH + 'tet.npz')
+
+# events = data['events']
+# # events = np.delete(events, np.where(np.logical_and(events['genLepton1_pdgId'] != 15,events['genLepton1_pdgId'] != 17)))
+# # events = np.delete(events, np.where(np.logical_and(events['genLepton4_pdgId'] != 15,events['genLepton4_pdgId'] != 17)))
+
+
+# print(np.mean(events['genLepton1_pdgId']))
+# print(np.mean(events['genLepton2_pdgId']))
+# print(np.mean(events['genLepton1_pdgId']+events['genLepton2_pdgId']))
+# print(np.std(events['genLepton1_pdgId']+events['genLepton2_pdgId']))
+# print(np.mean(events['tauH_mass']))
+
+# a = [[1,2],[3,5]]
+
+# print(a[0][1])
+
+# v = np.array([1,2])
+
+# m = np.array([[3,4],[5,6]])
+
+# print(m.T)
+
+# l = np.array([1,2,3,4])
+# l1 = np.array([1,2,3,4])*10
+# l2 = np.array([1,2,3,4])*100
+# l3 = np.array([1,2,3,4])*1000
+
+# v = np.c_[l,l]
+
+# print(v*l3[:,np.newaxis])
+
+
+# m = np.dstack((np.c_[l2,l3], np.c_[l,l1]))
+# # print(m)
+# # print(v)
+# # print(np.matmul(m[0],v[0]))
+# # print(np.matmul(m,v[0]))
+
+# # print(np.full((10,2,2),m[0]))
+
+# m0 = np.array([[1,0],[0,2]])
+
+# print(m.shape, v.shape)
+# a = np.einsum('ji,kj->ki',m0,v)
+# print(a)
+# print(v)
+
+# print(np.einsum('ij,ij->i',v,a))
+
+
+
+# a = np.linspace(5,7,4)
+
+# b=3*a
+# c=2*a
+
+# def combineArrayToMatrixArray(a,b,c,d):
+#     out =np.dstack((np.c_[a,b], np.c_[c,d]))
+
+#     return out
+
+# def inverse2x2(A):
+
+#     det =  A[0][0]*A[1][1]-A[0][1]*A[1][0]
+#     return np.array([
+#         [A[1][1],-A[1][0]],
+#         [-A[0][1],A[0][0]]]
+#         )/det
+
+
+# covMat = combineArrayToMatrixArray(a,b ,b ,c)
+# inverseCovMat = np.array([inverse2x2(m) for m in covMat])
+
+# print(inverse2x2(np.array([[a[0],b[0]],[b[0],c[0]]])))
+
+# print(covMat)
+# print('\n \n \n')
+# print(inverseCovMat)
+
+# print(np.matmul(covMat,inverseCovMat))
+
+# print(np.mean(inverseCovMat[:][0][0]))
+# print(np.mean(inverseCovMat[:][0][1]))
+# print(np.mean(inverseCovMat[:][1][0]))
+# print(np.mean(inverseCovMat[:][1][1]))
+
+data = np.load('/nfs/dust/cms/user/lukastim/bachelor/data/DataSet.npy')
+
+
+
+
+
+
+print(np.mean(data['met_invcov00']))
+print(np.mean(data['met_invcov01']))
+print(np.mean(data['met_invcov11']))
+
+print(min(data['met_invcov00']))
+print(min(data['met_invcov01']))
+print(min(data['met_invcov11']))
+
+# print(np.std(data['met_invcov00']))
+# print(np.std(data['met_invcov01']))
+# print(np.std(data['met_invcov11']))
+
+
+
+# print(np.mean(data['met_cov00']))
+# print(np.mean(data['met_cov01']))
+# print(np.mean(data['met_cov11']))
+# print(np.std(data['met_cov00']))
+# print(np.std(data['met_cov01']))
+# print(np.std(data['met_cov11']))

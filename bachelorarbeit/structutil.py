@@ -16,8 +16,7 @@ def updateStructArray(olddata, key, data):
         olddata[key] = data
         newdata = olddata
     else:
-    
-        newdata = rf.append_fields(olddata,key,data ,usemask=False)
+        newdata = rf.append_fields(olddata,key,data , usemask=False)
     return newdata
 
 def updateStructArrayWithFloatArray(olddata, key, data):

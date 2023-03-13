@@ -46,7 +46,7 @@ def getBBE1Chi2(data):
     
 def genBBE1Chi2(BE1_mes,sigma):
     def BE1Chi2(BE1_fit):
-        return ((BE1_fit - BE1_mes)/sigma)**2
+        return ((BE1_mes - BE1_fit)/sigma)**2
     return BE1Chi2
 
 
