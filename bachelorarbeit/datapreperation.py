@@ -14,18 +14,18 @@ from PATHS import RAWDATAPATH
 relevantKeys = ['bjet2_e','bjet1_e','bjet2_eta','bjet2_phi','bjet1_eta','bjet1_phi','bjet2_pt','bjet1_pt','genBQuark2_e','genBQuark1_e','genBQuark2_eta','genBQuark2_phi','genBQuark1_eta','genBQuark1_phi','genBQuark2_pt','genBQuark1_pt','rho','nbjetscand','bjet1_btag_deepFlavor','bjet2_btag_deepFlavor','dau1_eta','dau2_eta', 'dau1_phi','dau2_phi' ,'genLepton1_eta','genLepton2_eta', 'genLepton1_phi','genLepton2_phi','tauH_mass','dau2_e','dau1_e','dau2_pt','dau1_pt','genLepton1_pt','genLepton2_e','genLepton1_e','genLepton2_pt', 'met_cov00', 'met_cov01','met_cov11','pairType' ]
 
 
-# files = glob(RAWDATAPATH+'*.npz')
+files = glob(RAWDATAPATH+'*.npz')
 
-# for i,f in enumerate(files):
-#     data = np.load(f)
-#     if i is 0:
-#         events = data['events']
-#     else:
-#         events = np.append(events,data['events'])
+for i,f in enumerate(files):
+    data = np.load(f)
+    if i is 0:
+        events = data['events']
+    else:
+        events = np.append(events,data['events'])
 
-path = RAWDATAPATH + 'tet.npz'
+# path = RAWDATAPATH + 'tet.npz'
 
-events =  np.load(path)['events']
+# events =  np.load(path)['events']
 
 print(len(events))
 
