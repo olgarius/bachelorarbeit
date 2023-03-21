@@ -204,4 +204,66 @@ def plot1v2hist(x,y, expectedxy, expectedlabel, xlim, ylim, bins, xlabel, ylabel
 
     plt.rcParams["text.usetex"] = False
 
+def plotHistCompare(path, xLabel, title, xlim, bins,*x, yLabel= r"Normalized Denisty", ylim=[0,1], density=True, xscale='linear', yscale='linear', alttitle = None):
+    fig = plt.figure()
+  
 
+    plt.rcParams["text.usetex"] = True
+
+
+
+
+
+    for xc in x:
+        mean2 = np.mean(xc[0])
+        std2 = np.std(xc[0])
+        label  = xc[1] +r"$\mu = $" + str(round(mean2,2)) + r" $\sigma = $" + str(round(std2,2))
+        plt.hist(xc[0],bins,range=tuple(xlim),density=density,histtype=u'step', label=label, linewidth=3)
+    plt.legend(fontsize=15, loc = 1)
+
+    plt.xlim(xlim)
+    plt.ylim(ylim)
+    plt.yscale(yscale)
+    plt.xscale(xscale)
+
+
+    plt.xlabel(xLabel)
+    plt.ylabel(yLabel)
+    plt.title(title, fontsize = 30)
+
+    plt.tight_layout()
+
+
+    if alttitle is not None:
+        title =alttitle
+
+    plt.savefig(path + title)
+    plt.rcParams["text.usetex"] = False
+
+
+def scatter(path, title, xlabel, ylabel, *x, lim=[0,300], alttitle= None, ):
+    fig,ax  = plt.subplots(figsize = (10,10))
+    plt.rcParams["text.usetex"] = True
+
+    for xs in x:
+        plt.scatter(xs[0],xs[1], label = xs[2], s=2)
+
+    plt.legend(fontsize=15, loc = 1)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xlim(lim)
+    plt.ylim(lim)
+    plt.title(title, fontsize=30)
+    ax.set_box_aspect(1)
+
+    plt.tight_layout()
+
+    
+    if alttitle is not None:
+        title =alttitle
+
+    plt.savefig(path + title)
+
+
+
+    plt.rcParams["text.usetex"] = False
