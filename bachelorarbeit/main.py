@@ -116,7 +116,7 @@ for i, n in enumerate(be1functions):
 
 print('Negative sigma percentage: ',counterNegSigma/len(be1functions)*100, '%')
 print('Out of bounds min percentage: ',counterEdge/len(be1functions)*100, '%')
-print('Chi2 > 3.84 percentage: ',len(np.where(np.array(minvalues) > 3.84))/len(minvalues)*100, '%')
+print('Chi2 > 3.84 percentage: ',len(np.where(np.array(minvalues) > 3.84)[0])/len(minvalues)*100, '%')
 
 print(np.average(minpos),np.std(minpos))
 # print(min(minpos),max(minpos))

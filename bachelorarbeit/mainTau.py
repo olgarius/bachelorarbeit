@@ -146,7 +146,7 @@ for i, n in enumerate(TauE1_mes):
 
 print('Negative sigma percentage: ',counterNegSigma/len(TauE1_mes)*100, '%')
 print('Out of bounds min percentage: ',counterEdge/len(TauE2_mes)*100, '%')
-print('Chi2 > 3.84 percentage: ',len(np.where(np.array(minvalues) > 3.84))/len(minvalues)*100, '%')
+print('Chi2 > 3.84 percentage: ',len(np.where(np.array(minvalues) > 3.84)[0])/len(minvalues)*100, '%')
 
 print(np.average(minpos),np.std(minpos))
 # print(min(minpos),max(minpos))
