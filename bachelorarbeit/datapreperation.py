@@ -11,7 +11,7 @@ import datautil as du
 
 from PATHS import RAWDATAPATH
 
-relevantKeys = ['bjet2_e','bjet1_e','bjet2_eta','bjet2_phi','bjet1_eta','bjet1_phi','bjet2_pt','bjet1_pt','genBQuark2_e','genBQuark1_e','genBQuark2_eta','genBQuark2_phi','genBQuark1_eta','genBQuark1_phi','genBQuark2_pt','genBQuark1_pt','rho','nbjetscand','bjet1_btag_deepFlavor','bjet2_btag_deepFlavor','dau1_eta','dau2_eta', 'dau1_phi','dau2_phi' ,'genLepton1_eta','genLepton2_eta', 'genLepton1_phi','genLepton2_phi','tauH_mass','dau2_e','dau1_e','dau2_pt','dau1_pt','genLepton1_pt','genLepton2_e','genLepton1_e','genLepton2_pt', 'met_cov00', 'met_cov01','met_cov11','pairType' ]
+relevantKeys = ['bjet2_e','bjet1_e','bjet2_eta','bjet2_phi','bjet1_eta','bjet1_phi','bjet2_pt','bjet1_pt','genBQuark2_e','genBQuark1_e','genBQuark2_eta','genBQuark2_phi','genBQuark1_eta','genBQuark1_phi','genBQuark2_pt','genBQuark1_pt','rho','nbjetscand','bjet1_btag_deepFlavor','bjet2_btag_deepFlavor','dau1_eta','dau2_eta', 'dau1_phi','dau2_phi' ,'genLepton1_eta','genLepton2_eta', 'genLepton1_phi','genLepton2_phi','tauH_mass','dau2_e','dau1_e','dau2_pt','dau1_pt','genLepton1_pt','genLepton2_e','genLepton1_e','genLepton2_pt', 'met_cov00', 'met_cov01','met_cov11','pairType', 'met_et', 'met_phi']
 
 
 files = glob(RAWDATAPATH+'*.npz')
@@ -100,7 +100,23 @@ dataSet = su.updateStructArray(dataSet,'genbie_to_genbje', genfacs)
 dataSet = su.updateStructArray(dataSet,'tauie_to_tauje', facstau)
 dataSet = su.updateStructArray(dataSet,'gentauie_to_gentauje', genfacstau)
 
+metX = np.cos(su.structToArray(dataSet, 'met_phi'))*su.structToArray(dataSet,'met_et')
+metY = np.sin(su.structToArray(dataSet, 'met_phi'))*su.structToArray(dataSet,'met_et')
 
+tau1_ex, tau1_ey, tau1_ez = mu.detCoordinatesToCartesian((su.structToArray(dataSet,'dau1_e'),su.structToArray(dataSet,'dau1_phi'),su.structToArray(dataSet,'dau1_eta')))
+tau2_ex, tau2_ey, tau2_ez = mu.detCoordinatesToCartesian((su.structToArray(dataSet,'dau2_e'),su.structToArray(dataSet,'dau2_phi'),su.structToArray(dataSet,'dau2_eta')))
+
+dataSet = su.updateStructArray(dataSet,'dau1_ex',tau1_ex)
+dataSet = su.updateStructArray(dataSet,'dau2_ex',tau2_ex)
+
+dataSet = su.updateStructArray(dataSet,'dau1_ey',tau1_ey)
+dataSet = su.updateStructArray(dataSet,'dau2_ey',tau2_ey)
+
+dataSet = su.updateStructArray(dataSet,'dau1_ez',tau1_ez)
+dataSet = su.updateStructArray(dataSet,'dau2_ez',tau2_ez)
+
+dataSet = su.updateStructArray(dataSet,'met_x',metX)
+dataSet = su.updateStructArray(dataSet,'met_y',metY)
 
 
 inverseCovMat = np.array([inv([[a,b],[b,c]]) for a,b,c in zip(dataSet['met_cov00'], dataSet['met_cov01'], dataSet['met_cov11'])])

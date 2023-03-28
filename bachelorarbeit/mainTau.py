@@ -14,7 +14,11 @@ import scipy.optimize as sopt
 
 from PATHS import WORKINGDATAPATH
 
-EPSILON = 0.9
+EPSILON = 0.7
+EPSILON2 = 20
+
+TAUERR = 0.1
+
 MHIGGS = 125.25
 
 
@@ -32,12 +36,26 @@ mins = []
 sigmaFits = []
 minpos = []
 
+tau1_ex = su.structToArray(events,'dau1_ex')
+tau1_ey = su.structToArray(events,'dau1_ey')
+tau1_ez = su.structToArray(events,'dau1_ez')
+
+tau2_ex = su.structToArray(events,'dau2_ex')
+tau2_ey = su.structToArray(events,'dau2_ey')
+tau2_ez = su.structToArray(events,'dau2_ez')
+
+met_x = su.structToArray(events,'met_x')
+met_y = su.structToArray(events,'met_y')
+
+
+
+
 TauE1_mes = su.structToArray(events,'dau1_e') 
 TauE2_mes = su.structToArray(events,'dau2_e') 
-TauE1_eta = su.structToArray(events,'dau1_eta') 
-TauE2_eta = su.structToArray(events,'dau2_eta') 
-TauE1_phi = su.structToArray(events,'dau1_phi') 
-TauE2_phi = su.structToArray(events,'dau2_phi')
+# TauE1_eta = su.structToArray(events,'dau1_eta') 
+# TauE2_eta = su.structToArray(events,'dau2_eta') 
+# TauE1_phi = su.structToArray(events,'dau1_phi') 
+# TauE2_phi = su.structToArray(events,'dau2_phi')
 
 TauHM_mes = su.structToArray(events,'tauH_mass')
 fac = su.structToArray(events,'tauie_to_tauje')
@@ -65,42 +83,64 @@ chi2dicts = []
 
 for i, n in enumerate(TauE1_mes):
 
+    def fitfunc(x):
+        return fac[i]/x
 
 
+    evaluationAxisTau1E = mu.axisValueTransformToMu1Mu2(unitAxis[0],TauE1_mes[i], TauE2_mes[i], TAUERR*TauE1_mes[i], TAUERR*TauE2_mes[i],fitfunc,3)
+    # evaluationAxisTau1E = np.linspace(EPSILON*n,MHIGGS**2/TauHM_mes[i]**2 * 1/EPSILON*n,100)
+    # evaluationAxisTau1E = np.linspace(n-EPSILON2,MHIGGS**2/TauHM_mes[i]**2 * n*TauE2_mes[i] /(TauE2_mes[i]-EPSILON2),100)
+    # evaluationAxisTau1E = np.linspace(TauE1_mes[i],fac[i]/(0.99*TauE2_mes[i]),100)
+    # print(evaluationAxisTau1E)
+
+    evaluationAxisf = np.linspace(0,1,100)
+
+
+    evaluationAxisArr.append(evaluationAxisTau1E)
     
-    
-    
 
-    evaluationAxis = np.linspace(EPSILON*n,MHIGGS**2/TauHM_mes[i]**2 * 1/EPSILON*n,100)
-    evaluationAxisArr.append(evaluationAxis)
-    
-
-    def f1chi2(x):
-        return ((x-n)/(0.1*n))**2
-    
-    def f2chi2(x):
-        return (((fac[i]/x)-TauE2_mes[i])/(TauE2_mes[i]*0.1))**2
-
-    def f3chi2(x):
-        thetaTau1 = mu.pseudoRapToPolar(TauE1_eta[i])
-        thetaTau2 = mu.pseudoRapToPolar(TauE2_eta[i])
-        Tau1scalar = (n-x)*np.sin(thetaTau1)
-        Tau1Vector = np.c_[np.cos(TauE1_phi[i]),np.sin(TauE1_phi[i])] * Tau1scalar[:,np.newaxis]
-
-        Tau2scalar = (TauE2_mes[i]-fac[i]/x)*np.sin(thetaTau2)
-        Tau2Vector = np.c_[np.cos(TauE2_phi[i]),np.sin(TauE2_phi[i])] * Tau2scalar[:,np.newaxis]
+    def f1chi2(x,f1):
+        tau1_e = np.sqrt((tau1_ex[i]+f1*met_x[i])**2+(tau1_ey[i]+f1*met_y[i])**2+tau1_ez[i]**2)
+        return ((tau1_e-x)/(TAUERR*TauE1_mes[i]))**2
 
 
-        delta =  Tau1Vector +  Tau2Vector
+    def f2chi2(x,f1):
+        tau2_e = np.sqrt((tau2_ex[i]+(1-f1)*met_x[i])**2+(tau2_ey[i]+(1-f1)*met_y[i])**2+tau2_ez[i]**2)
+        return ((tau2_e-fac[i]/x)/TauE2_mes[i]*TAUERR)**2
 
-        # return np.matmul(delta, np.matmul(invCov,delta))
-        return np.einsum('ij,ij->i',delta, np.einsum('ji,kj->ki',invCovMat[i],delta))
+
+    # def f1chi2(x,f1):
+    #     tau1_e = np.sqrt((tau1_ex[i]+f1*met_x[i])**2+(tau1_ey[i]+f1*met_y[i])**2+tau1_ez[i]**2)
+    #     return ((tau1_e-x)/(0.03*n))**2
+
+
+    # def f2chi2(x,f2):
+    #     tau2_e = np.sqrt((tau2_ex[i]+f2*met_x[i])**2+(tau2_ey[i]+f2*met_y[i])**2+tau2_ez[i]**2)
+    #     return ((tau2_e-fac[i]/x)/TauE2_mes[i]*0.03)**2
+        
+    # def f3chi2(f1,f2):
+        
+    #     f12 = 1-(np.add(f1,f2))
+    #     met = np.c_[met_x[i],met_y[i]]
+    #     delta = met * f12[:,:,np.newaxis]
+
+    #     return np.einsum('ilj,ilj->il',delta, np.einsum('ji,klj->kli',invCovMat[i],delta))
+
+    # def f3chi2(f1,f2):
+    #     return (1-f1-f2)**2
+
 
     g = grid.grid()
-    g.addDimension(evaluationAxis)
-    g.addFunction(f1chi2, [1])
-    g.addFunction(f2chi2, [1])
-    g.addFunction(f3chi2, [1])
+    g.addDimension(evaluationAxisTau1E)
+    g.addDimension(evaluationAxisf)
+    # g.addDimension(evaluationAxisf)
+
+    g.addFunction(f1chi2, [1,2])
+    g.addFunction(f2chi2, [1,2])
+
+    # g.addFunction(f1chi2, [1,2])
+    # g.addFunction(f2chi2, [1,3])
+    # g.addFunction(f3chi2, [2,3])
 
 
     g.evaluate()
@@ -112,7 +152,7 @@ for i, n in enumerate(TauE1_mes):
     if min(mp[0]) == 0 or max(mp[0]) == 99:
         counterEdge += 1
         edgeProblem.append(g.evaluated)
-        edgeProblemAxis.append(evaluationAxis)
+        edgeProblemAxis.append(evaluationAxisTau1E)
         edgeProblemIndex.append(i)
 
 
@@ -125,23 +165,47 @@ for i, n in enumerate(TauE1_mes):
     minvalues.append(minvalue)
     if minvalue > 10:
         highminvalue.append(g.evaluated)
-        highminvalueAxis.append(evaluationAxis)
+        highminvalueAxis.append(evaluationAxisTau1E)
         highminvalueIndex.append(i)
 
-    def f(x):
-        return f1chi2(x)+f2chi2(x)+f3chi2(x) -minvalue-1
-    root1 = sopt.fsolve(f,evaluationAxis[0])
-    root2 = sopt.fsolve(f,evaluationAxis[99])
+    # def f(x,y,z):
+    #     return f1chi2(x,y)+f2chi2(x,z)+f3chi2(y,z) -minvalue-1
+    # root1 = sopt.fsolve(f,evaluationAxisTau1E[0])
+    # root2 = sopt.fsolve(f,evaluationAxisTau1E[99])
 
 
-    sigmaFit = root2[0]  -root1[0] 
+    # sigmaFit = root2[0]  -root1[0] 
 
-    if sigmaFit < 0:
-        counterNegSigma +=1
+    tempGrid = g.evaluated
+    for j in reversed(range(g.dimension-1)):
+        tempGrid = np.amin(tempGrid,j)
+    
+    tempGrid = tempGrid - minvalue - 1
+    # print(tempGrid)
 
+    if tempGrid[0] <0 or tempGrid[-1] <0:
+        # print('sigma OOB ', tempGrid[-0], tempGrid[-1]) 
+        sigmaFit = -1
+    else:
+        # print(mp[0][0])
+        tempGrid = tempGrid**2
+        gA = tempGrid[0:mp[0][0]]
+        gB = tempGrid[mp[0][0]:(len(tempGrid)-1)]
+        if len(gB) is 0 or len(gA) is 0:
+            sigmaFit = -1
+        else:
+            left = evaluationAxisTau1E[np.where(min(gA)==gA)[0][0]]
+            right = evaluationAxisTau1E[np.where(min(gB)==gB)[0][-1]+len(gA)]
+            sigmaFit = right - left
+        print(left,right, sigmaFit)
     sigmaFits.append(sigmaFit)
 
-    chi2dict = {'index' : indices[i], 'xAxis' :  evaluationAxis.tolist(), 'values' : g.evaluated.tolist()}
+    # if sigmaFit < 0:
+    #     counterNegSigma +=1
+
+    # sigmaFits.append(sigmaFit)
+
+    chi2dict = {'index' : indices[i], 'xAxis' :  evaluationAxisTau1E.tolist(), 'values' : g.evaluated.tolist()}
     chi2dicts.append(json.dumps(chi2dict))
 
 print('Negative sigma percentage: ',counterNegSigma/len(TauE1_mes)*100, '%')

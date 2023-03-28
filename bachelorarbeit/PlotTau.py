@@ -52,17 +52,17 @@ pullOriginal2 = (taue2 - taue2gen)/taue2gen
 
 
 
-plotting.plotHist(chi2sigma/be1fit,PATHTOPLOTSTAU,r"$\frac{\sigma_{\chi^2}}{E_{\tau 1}^f}$",r"$\sigma_{\chi^2}$-Distribution", [0,0.15], 100,ylim=[0,20] ,alttitle='Tau_sigmaChi2DistributionNormed')
+plotting.plotHist(chi2sigma/be1fit,PATHTOPLOTSTAU,r"$\frac{\sigma_{\chi^2}}{E_{\tau 1}^f}$",r"$\sigma_{\chi^2}$-Distribution", [-0.15,2], 100,ylim=[0,20] ,alttitle='Tau_sigmaChi2DistributionNormed')
 
 
-plotting.plotHist(chi2sigma,PATHTOPLOTSTAU,r"$\sigma_{\chi^2}$ in GeV",r"$\sigma_{\chi^2}$-Distribution", [0,60], 100,ylim=[0,0.1] ,alttitle='Tau_sigmaChi2Distribution')
+plotting.plotHist(chi2sigma,PATHTOPLOTSTAU,r"$\sigma_{\chi^2}$ in GeV",r"$\sigma_{\chi^2}$-Distribution", [-1.25,1000], 100,ylim=[0,0.1] ,alttitle='Tau_sigmaChi2Distribution')
 
 plotting.plotHistCompare(PATHTOPLOTSTAU, r"Pull Value", r"Fitted vs. Measuerd $E_{\tau 1}$ Values", [-1,1.5], 100, (pullOriginal1, r"$\frac{E_{\tau 1}^{m}}{E_{\tau 1}^{g}}-1$ "),(pullFit1,r"$\frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1$ "),ylim=[0,2], alttitle='TauPullFitVsMeas')
 
 
 
 # plotting.plotHist(chi2val,PATHTOPLOTSTAU,r"$\chi^2$-Value",r"$\chi^2$-Value Distribution",xlim=[0,70], ylim =[0.005,0.1], yscale='log',bins=80, alttitle='Tau_Chi2ValueDistribution')
-plotting.plotHist(chi2val,PATHTOPLOTSTAU,r"$\chi^2$-Value",r"$\chi^2$-Value Distribution",xlim=[0,1000], ylim =[0.0,0.01], bins=200, alttitle='Tau_Chi2ValueDistributionNonLog')
+plotting.plotHist(chi2val,PATHTOPLOTSTAU,r"$\chi^2$-Value",r"$\chi^2$-Value Distribution",xlim=[0,2], ylim =[0.0,10], bins=200, alttitle='Tau_Chi2ValueDistributionNonLog')
 
 
 
