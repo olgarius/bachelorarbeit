@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolor
 import mplhep as hep
 
+from collections.abc import Iterable
+
 plt.style.use('/afs/desy.de/user/l/lukastim/code/bachelorarbeit/plot.mplstyle')
 
 
@@ -241,18 +243,27 @@ def plotHistCompare(path, xLabel, title, xlim, bins,*x, yLabel= r"Normalized Den
     plt.rcParams["text.usetex"] = False
 
 
-def scatter(path, title, xlabel, ylabel, *x, lim=[0,300], alttitle= None, ):
+def scatter(path, title, xlabel, ylabel, *x, lim=[0,300], alttitle= None, yLim=None,s=2):
     fig,ax  = plt.subplots(figsize = (10,10))
     plt.rcParams["text.usetex"] = True
 
-    for xs in x:
-        plt.scatter(xs[0],xs[1], label = xs[2], s=2)
+    colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    
+
+    for i,xs in enumerate(x):
+        if isinstance(xs[0],Iterable):
+            plt.scatter(xs[0],xs[1], label = xs[2], s=s, color = colors[i%len(colors)])
+        else:
+            plt.axvline(xs[0],label = xs[2],color = colors[i%len(colors)])
 
     plt.legend(fontsize=15, loc = 1)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
+
+    if yLim is None:
+        yLim = lim
     plt.xlim(lim)
-    plt.ylim(lim)
+    plt.ylim(yLim)
     plt.title(title, fontsize=30)
     ax.set_box_aspect(1)
 
