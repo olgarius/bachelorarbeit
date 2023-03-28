@@ -102,19 +102,19 @@ class grid:
 
 
         #build an evaluation grid with the specified dimensions
-        revDimList = list(range(len(dimList)))
+        revDimList = list(reversed(range(len(dimList))))
         #revDimList.reverse()
         dimSet = set(dimList)
 
-
         for n in revDimList:
             if n is revDimList[0]:
-                evaOutList = [len(self.evaValues[n-1])*[0]]
+                evaOutList = [len(self.evaValues[n])*[0]]
             else:
-                evaOutList = [len(self.evaValues[n-1])*evaOutList]
+                evaOutList = [len(self.evaValues[n])*evaOutList]
+
+            
         evaOut = np.array(evaOutList[0])
-    
-        
+
 
 
         #evaluate all functions dependend on the given dimensions and add them up
@@ -122,16 +122,24 @@ class grid:
             fdims = self.fdimensions[i] #get dimensions of function
             if set(fdims) <= dimSet:   #evaluate function if dependet on given dimensions
                 fevaValues = self.buildGrid(fdims)  #get evaluation values
+                
                 values = f(*fevaValues)  #calculate function values
                 
-                source = np.array(self.mapDimensions(fdims,dimList))-1
-                target = np.arange(len(fdims))
+                source = np.array(self.mapDimensions(fdims,dimList))
+                target = (np.arange(len(fdims))+1)*-1
+
+            
 
                 #add evaluated values to the output
                 tempEva = np.moveaxis(evaOut,source,target) 
+              
                 temp2Eva = tempEva + values
                 evaOut = np.moveaxis(temp2Eva,target,source)
-                
+
+                # evaOut = evaOut + values
+
+
+
         self.evaluated = evaOut
 
     def getMin(self):
@@ -143,9 +151,6 @@ class grid:
        for i,n in enumerate(m):
             out.append(self.evaValues[i][n[0]])
        return out
-
-    def getCut(self, hight):
-        grid = np.sign(self.evaluated - hight)
 
     
 
