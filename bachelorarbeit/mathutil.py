@@ -48,7 +48,7 @@ def detCoordinatesToCartesian(x):
     ----------
 
     x : Tuple of size 3
-        with the entries r, phi, eta  
+        with the entries r, phi, eta (r is only in transversal direction!)  
     '''
     return (x[0] * np.cos(x[1]), x[0] * np.sin(x[1]),x[0] * np.sinh(x[2]) )
 
