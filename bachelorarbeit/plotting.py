@@ -56,9 +56,20 @@ def plot2d2(x, y, path, xLabel, yLabel ,xlim=[0,1000] ,ylim=[0,1000] ,bins=100):
 
     return fig
 
-def plot2d3(X,Coords, path, xLabel,yLabel,xlim=[0,100] ,ylim=[0,100],numXticks = 5, numYticks = 5):
+def plot2d3(Z,Coords, path, xLabel,yLabel,levels=6):
     fig = plt.figure()
-    plt.imshow(X)
+    # im = plt.imshow(X)
+    # fig.colorbar(im)
+    
+
+
+    X,Y = np.meshgrid(Coords[0],Coords[1])
+
+
+    plt.pcolor(X,Y,Z)
+    cs =plt.contour(X,Y,Z,levels,colors = 'k')
+    plt.clabel(cs,fontsize=9,inline=True)
+
 
     plt.xlabel(xLabel)
     plt.ylabel(yLabel)
@@ -66,16 +77,16 @@ def plot2d3(X,Coords, path, xLabel,yLabel,xlim=[0,100] ,ylim=[0,100],numXticks =
 
 
 
-    plt.xticks(np.linspace(*xlim,numXticks),np.linspace(Coords[0][0],Coords[0][-1],numXticks))
-    plt.yticks(np.linspace(*ylim,numYticks),np.linspace(Coords[1][0],Coords[1][-1],numYticks))
+    # plt.xticks(np.linspace(*xlim,numXticks),np.around(np.linspace(Coords[0][0],Coords[0][-1],numXticks),decimals=dec))
+    # plt.yticks(np.linspace(*ylim,numYticks),np.around(np.linspace(Coords[1][0],Coords[1][-1],numYticks),decimals=dec))
 
-    plt.xlim(xlim)
-    plt.ylim(ylim)  
+    # plt.xlim(xlim)
+    # plt.ylim(ylim)  
     
     plt.savefig(path + xLabel + '_' + yLabel + '.png') 
 
 
-def plot1d1(xkey, events, path,xlim=[0,1000], binsize=5, density=True):
+def plot1d1(xkey, events, path,xlim=[0,1000], binsize=5, density=True,):
     fig = plt.figure()
 
     x = np.array([k[0] for k in events[[xkey]]])
@@ -277,4 +288,57 @@ def scatter(path, title, xlabel, ylabel, *x, lim=[0,300], alttitle= None, yLim=N
 
 
 
+    plt.rcParams["text.usetex"] = False
+
+def binCompare(path, x, y, xLabel, title, xlim, bins, yLabel= r"Log Bin Content Ratio", ylim=[-5,5],  xscale='linear', label = r'$\frac{x}{y}$', alttitle = None):
+    fig = plt.figure()
+  
+
+    plt.rcParams["text.usetex"] = True
+
+
+
+    hist1, edges1  = np.histogram(x,bins,xlim)
+    hist2, edges2 = np.histogram(y,bins,xlim)
+
+    hist3l = []
+    
+    for h1,h2 in zip(hist1,hist2):
+        if h1 != 0 and h2 !=0:
+            hist3l.append(np.log(h1/h2))
+        elif  h1 != 0:    
+            hist3l.append(ylim[1])
+        elif h2 != 0:
+            hist3l.append(ylim[0])
+        else:
+            hist3l.append(0)
+    hist3 = np.array(hist3l)
+
+
+   
+
+   
+
+    plt.bar(edges1[:-1],hist3,width=(xlim[1]-xlim[0])/bins,label=label)
+
+    
+    plt.legend(fontsize=15, loc = 1)
+
+    plt.xlim(xlim)
+    plt.ylim(ylim)
+  
+    plt.xscale(xscale)
+
+
+    plt.xlabel(xLabel)
+    plt.ylabel(yLabel)
+    plt.title(title, fontsize = 30)
+
+    plt.tight_layout()
+
+
+    if alttitle is not None:
+        title =alttitle
+
+    plt.savefig(path + title)
     plt.rcParams["text.usetex"] = False
