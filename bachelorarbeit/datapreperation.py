@@ -11,7 +11,7 @@ import datautil as du
 
 from PATHS import RAWDATAPATH
 
-relevantKeys = ['bjet2_e','bjet1_e','bjet2_eta','bjet2_phi','bjet1_eta','bjet1_phi','bjet2_pt','bjet1_pt','genBQuark2_e','genBQuark1_e','genBQuark2_eta','genBQuark2_phi','genBQuark1_eta','genBQuark1_phi','genBQuark2_pt','genBQuark1_pt','rho','nbjetscand','bjet1_btag_deepFlavor','bjet2_btag_deepFlavor','dau1_eta','dau2_eta', 'dau1_phi','dau2_phi' ,'genLepton1_eta','genLepton2_eta', 'genLepton1_phi','genLepton2_phi','tauH_mass','dau2_e','dau1_e','dau2_pt','dau1_pt','genLepton1_pt','genLepton2_e','genLepton1_e','genLepton2_pt', 'met_cov00', 'met_cov01','met_cov11','pairType', 'met_et', 'met_phi']
+relevantKeys = ['bjet2_e','bjet1_e','bjet2_eta','bjet2_phi','bjet1_eta','bjet1_phi','bjet2_pt','bjet1_pt','genBQuark2_e','genBQuark1_e','genBQuark2_eta','genBQuark2_phi','genBQuark1_eta','genBQuark1_phi','genBQuark2_pt','genBQuark1_pt','rho','nbjetscand','bjet1_btag_deepFlavor','bjet2_btag_deepFlavor','dau1_eta','dau2_eta', 'dau1_phi','dau2_phi' ,'genLepton1_eta','genLepton2_eta', 'genLepton1_phi','genLepton2_phi','tauH_mass','dau2_e','dau1_e','dau2_pt','dau1_pt','genLepton1_pt','genLepton2_e','genLepton1_e','genLepton2_pt', 'met_cov00', 'met_cov01','met_cov11','pairType', 'met_et', 'met_phi','genNu1_e','genNu2_e','genNu1_pt','genNu2_pt','genNu1_phi','genNu2_phi','genNu1_eta','genNu2_eta' ]
 
 
 files = glob(RAWDATAPATH+'*.npz')
@@ -50,7 +50,7 @@ repackedData = su.updateStructArray(repackedData, 'index', indexarray)
 
 
 BquarkSwitchList = (('bjet2_e','bjet1_e'),('bjet2_eta','bjet1_eta'),('bjet2_phi','bjet1_phi'),('bjet2_pt','bjet1_pt'),('bjet1_btag_deepFlavor','bjet2_btag_deepFlavor'))
-TauSwitchList = (('dau2_e','dau1_e'),('dau2_eta','dau1_eta'),('dau2_phi','dau1_phi'),('dau2_pt','dau1_pt'))
+TauSwitchList = (('dau2_e','dau1_e'),('dau2_eta','dau1_eta'),('dau2_phi','dau1_phi'),('dau2_pt','dau1_pt'),('genNu1_e','genNu2_e'),('genNu1_pt','genNu2_pt'),('genNu1_phi','genNu2_phi'),('genNu1_eta','genNu2_eta'))
 
 
 
@@ -103,8 +103,31 @@ dataSet = su.updateStructArray(dataSet,'gentauie_to_gentauje', genfacstau)
 metX = np.cos(su.structToArray(dataSet, 'met_phi'))*su.structToArray(dataSet,'met_et')
 metY = np.sin(su.structToArray(dataSet, 'met_phi'))*su.structToArray(dataSet,'met_et')
 
-tau1_ex, tau1_ey, tau1_ez = mu.detCoordinatesToCartesian((su.structToArray(dataSet,'dau1_e'),su.structToArray(dataSet,'dau1_phi'),su.structToArray(dataSet,'dau1_eta')))
-tau2_ex, tau2_ey, tau2_ez = mu.detCoordinatesToCartesian((su.structToArray(dataSet,'dau2_e'),su.structToArray(dataSet,'dau2_phi'),su.structToArray(dataSet,'dau2_eta')))
+debugMetX = np.cos(su.structToArray(dataSet, 'genNu1_phi'))*su.structToArray(dataSet,'genNu1_pt')+np.cos(su.structToArray(dataSet, 'genNu2_phi'))*su.structToArray(dataSet,'genNu2_pt')
+debugMetY = np.sin(su.structToArray(dataSet, 'genNu1_phi'))*su.structToArray(dataSet,'genNu1_pt')+np.sin(su.structToArray(dataSet, 'genNu2_phi'))*su.structToArray(dataSet,'genNu2_pt')
+
+
+tau1_ex, tau1_ey, tau1_ez = mu.detCoordinatesToCartesian((su.structToArray(dataSet,'dau1_pt'),su.structToArray(dataSet,'dau1_phi'),su.structToArray(dataSet,'dau1_eta')))
+tau2_ex, tau2_ey, tau2_ez = mu.detCoordinatesToCartesian((su.structToArray(dataSet,'dau2_pt'),su.structToArray(dataSet,'dau2_phi'),su.structToArray(dataSet,'dau2_eta')))
+
+debugTau1_exComplete, debugTau1_eyComplete, debugTau1_ezComplete = mu.detCoordinatesToCartesian((su.structToArray(dataSet,'genLepton1_pt'),su.structToArray(dataSet,'genLepton1_phi'),su.structToArray(dataSet,'genLepton1_eta')))
+debugTau2_exComplete, debugTau2_eyComplete, debugTau2_ezComplete = mu.detCoordinatesToCartesian((su.structToArray(dataSet,'genLepton2_pt'),su.structToArray(dataSet,'genLepton2_phi'),su.structToArray(dataSet,'genLepton2_eta')))
+
+debugNu1_ex , debugNu1_ey , debugNu1_ez  = mu.detCoordinatesToCartesian((su.structToArray(dataSet,'genNu1_pt'),su.structToArray(dataSet,'genNu1_phi'),su.structToArray(dataSet,'genNu1_eta')))
+debugNu2_ex , debugNu2_ey , debugNu2_ez  = mu.detCoordinatesToCartesian((su.structToArray(dataSet,'genNu2_pt'),su.structToArray(dataSet,'genNu2_phi'),su.structToArray(dataSet,'genNu2_eta')))
+
+debugTau1_ex = debugTau1_exComplete - debugNu1_ex
+debugTau1_ey = debugTau1_eyComplete - debugNu1_ey
+debugTau1_ez = debugTau1_exComplete - debugNu1_ez
+
+debugTau1_e = su.structToArray(dataSet,'genLepton1_e')-su.structToArray(dataSet,'genNu1_e')
+
+debugTau2_ex = debugTau2_exComplete - debugNu2_ex
+debugTau2_ey = debugTau2_eyComplete - debugNu2_ey
+debugTau2_ez = debugTau2_exComplete - debugNu2_ez
+
+debugTau2_e = su.structToArray(dataSet,'genLepton2_e')-su.structToArray(dataSet,'genNu2_e')
+
 
 dataSet = su.updateStructArray(dataSet,'dau1_ex',tau1_ex)
 dataSet = su.updateStructArray(dataSet,'dau2_ex',tau2_ex)
@@ -117,6 +140,21 @@ dataSet = su.updateStructArray(dataSet,'dau2_ez',tau2_ez)
 
 dataSet = su.updateStructArray(dataSet,'met_x',metX)
 dataSet = su.updateStructArray(dataSet,'met_y',metY)
+
+dataSet = su.updateStructArray(dataSet,'debugdau1_ex',debugTau1_ex)
+dataSet = su.updateStructArray(dataSet,'debugdau2_ex',debugTau2_ex)
+
+dataSet = su.updateStructArray(dataSet,'debugdau1_ey',debugTau1_ey)
+dataSet = su.updateStructArray(dataSet,'debugdau2_ey',debugTau2_ey)
+
+dataSet = su.updateStructArray(dataSet,'debugdau1_ez',debugTau1_ez)
+dataSet = su.updateStructArray(dataSet,'debugdau2_ez',debugTau2_ez)
+
+dataSet = su.updateStructArray(dataSet,'debugdau1_e',debugTau1_e)
+dataSet = su.updateStructArray(dataSet,'debugdau2_e',debugTau2_e)
+
+dataSet = su.updateStructArray(dataSet,'debugmet_x',debugMetX)
+dataSet = su.updateStructArray(dataSet,'debugmet_y',debugMetY)
 
 
 inverseCovMat = np.array([inv([[a,b],[b,c]]) for a,b,c in zip(dataSet['met_cov00'], dataSet['met_cov01'], dataSet['met_cov11'])])
