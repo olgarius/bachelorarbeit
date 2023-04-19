@@ -36,29 +36,51 @@ mins = []
 sigmaFits = []
 minpos = []
 
-tau1_ex = su.structToArray(events,'dau1_ex')
-tau1_ey = su.structToArray(events,'dau1_ey')
-tau1_ez = su.structToArray(events,'dau1_ez')
+# tau1_ex = su.structToArray(events,'dau1_ex')
+# tau1_ey = su.structToArray(events,'dau1_ey')
+# tau1_ez = su.structToArray(events,'dau1_ez')
 
-tau2_ex = su.structToArray(events,'dau2_ex')
-tau2_ey = su.structToArray(events,'dau2_ey')
-tau2_ez = su.structToArray(events,'dau2_ez')
+# tau2_ex = su.structToArray(events,'dau2_ex')
+# tau2_ey = su.structToArray(events,'dau2_ey')
+# tau2_ez = su.structToArray(events,'dau2_ez')
 
-met_x = su.structToArray(events,'met_x')
-met_y = su.structToArray(events,'met_y')
+# met_x = su.structToArray(events,'met_x')
+# met_y = su.structToArray(events,'met_y')
+
+# TauE1_mes = su.structToArray(events,'dau1_e') 
+# TauE2_mes = su.structToArray(events,'dau2_e') 
+
+# fac = su.structToArray(events,'tauie_to_tauje')
+
+# Debug:
+
+tau1_ex = su.structToArray(events,'debugdau1_ex')
+tau1_ey = su.structToArray(events,'debugdau1_ey')
+tau1_ez = su.structToArray(events,'debugdau1_ez')
+
+tau2_ex = su.structToArray(events,'debugdau2_ex')
+tau2_ey = su.structToArray(events,'debugdau2_ey')
+tau2_ez = su.structToArray(events,'debugdau2_ez')
+
+met_x = su.structToArray(events,'debugmet_x')
+met_y = su.structToArray(events,'debugmet_y')
+
+TauE1_mes = su.structToArray(events,'debugdau1_e') 
+TauE2_mes = su.structToArray(events,'debugdau2_e') 
+
+fac = su.structToArray(events,'gentauie_to_gentauje')
+
+sc1= 0
+sc2 =0
 
 
-
-
-TauE1_mes = su.structToArray(events,'dau1_e') 
-TauE2_mes = su.structToArray(events,'dau2_e') 
 # TauE1_eta = su.structToArray(events,'dau1_eta') 
 # TauE2_eta = su.structToArray(events,'dau2_eta') 
 # TauE1_phi = su.structToArray(events,'dau1_phi') 
 # TauE2_phi = su.structToArray(events,'dau2_phi')
 
 TauHM_mes = su.structToArray(events,'tauH_mass')
-fac = su.structToArray(events,'tauie_to_tauje')
+
 indices = su.structToArray(events, 'index')
 invCovMat = du.combineArrayToMatrixArray(events['met_invcov00'], events['met_invcov01'], events['met_invcov01'], events['met_invcov11'])
 
@@ -100,13 +122,13 @@ for i, n in enumerate(TauE1_mes):
     
 
     def f1chi2(x,f1):
-        tau1_e = np.sqrt((tau1_ex[i]+f1*met_x[i])**2+(tau1_ey[i]+f1*met_y[i])**2+tau1_ez[i]**2)
-        return ((tau1_e-x)/(TAUERR*TauE1_mes[i]))**2
+        tau1_e = np.sqrt((tau1_ex[i]+f1*met_x[i])**2+(tau1_ey[i]+f1*met_y[i])**2+tau1_ez[i]**2,dtype=np.float32)
+        return ((tau1_e-x)/(TAUERR*TauE1_mes[i]))**2 
 
 
     def f2chi2(x,f1):
-        tau2_e = np.sqrt((tau2_ex[i]+(1-f1)*met_x[i])**2+(tau2_ey[i]+(1-f1)*met_y[i])**2+tau2_ez[i]**2)
-        return ((tau2_e-fac[i]/x)/TauE2_mes[i]*TAUERR)**2
+        tau2_e = np.sqrt((tau2_ex[i]+(1-f1)*met_x[i])**2+(tau2_ey[i]+(1-f1)*met_y[i])**2+tau2_ez[i]**2,dtype=np.float32)
+        return ((tau2_e-fac[i]/x)/(TauE2_mes[i]*TAUERR))**2 
 
 
     # def f1chi2(x,f1):
@@ -158,7 +180,7 @@ for i, n in enumerate(TauE1_mes):
 
     chi2.append(g.evaluated)
     chi2s = g.evaluated
-    chi2str.append(json.dumps(chi2s.tolist()))
+    # chi2str.append(json.dumps(chi2s.tolist()))
     mins.append(m[0])
 
     minvalue = np.min(g.evaluated)
@@ -186,18 +208,20 @@ for i, n in enumerate(TauE1_mes):
     if tempGrid[0] <0 or tempGrid[-1] <0:
         # print('sigma OOB ', tempGrid[-0], tempGrid[-1]) 
         sigmaFit = -1
+        sc1+=1
     else:
         # print(mp[0][0])
         tempGrid = tempGrid**2
         gA = tempGrid[0:mp[0][0]]
         gB = tempGrid[mp[0][0]:(len(tempGrid)-1)]
         if len(gB) is 0 or len(gA) is 0:
+            sc2+=1
             sigmaFit = -1
         else:
             left = evaluationAxisTau1E[np.where(min(gA)==gA)[0][0]]
             right = evaluationAxisTau1E[np.where(min(gB)==gB)[0][-1]+len(gA)]
             sigmaFit = right - left
-        print(left,right, sigmaFit)
+       
     sigmaFits.append(sigmaFit)
 
     # if sigmaFit < 0:
@@ -207,6 +231,9 @@ for i, n in enumerate(TauE1_mes):
 
     chi2dict = {'index' : indices[i], 'xAxis' :  evaluationAxisTau1E.tolist(), 'values' : g.evaluated.tolist()}
     chi2dicts.append(json.dumps(chi2dict))
+    
+    if i%1000 == 0:
+        print(i)
 
 print('Negative sigma percentage: ',counterNegSigma/len(TauE1_mes)*100, '%')
 print('Out of bounds min percentage: ',counterEdge/len(TauE2_mes)*100, '%')
@@ -215,7 +242,7 @@ print('Chi2 > 3.84 percentage: ',len(np.where(np.array(minvalues) > 3.84)[0])/le
 print(np.average(minpos),np.std(minpos))
 # print(min(minpos),max(minpos))
 
-
+print(sc1,sc2)
 
 # su.updateDataSetWithFloatArray(WORKINGDATAPATH,'chi2',chi2)
 # su.updateDataSetWithFloatArray(WORKINGDATAPATH,'ax1Values',evaluationAxisArr)
@@ -223,17 +250,17 @@ su.updateDataSet(WORKINGDATAPATH,'fitdau1_e', mins)
 su.updateDataSet(WORKINGDATAPATH,'fitdau2_e',fac/mins)
 su.updateDataSet(WORKINGDATAPATH,'dau_chi2val', minvalues)
 su.updateDataSet(WORKINGDATAPATH,'fitdau1_esigma',sigmaFits)
-su.updateDataSet(WORKINGDATAPATH, 'dau_chi2dict', chi2dicts)
+# su.updateDataSet(WORKINGDATAPATH, 'dau_chi2dict', chi2dicts) To memory intense
 
 
-print('EP indices: ',edgeProblemIndex)
+# print('EP indices: ',edgeProblemIndex)
 
 
 
 if len(edgeProblemIndex) > 1:
     fig = plt.figure()
 
-    plt.scatter(evaluationAxisArr[edgeProblemIndex[0]],chi2[edgeProblemIndex[0]])
+    plt.scatter(evaluationAxisArr[edgeProblemIndex[0]],np.amin(chi2[edgeProblemIndex[0]],1))
 
 
 
@@ -241,7 +268,7 @@ if len(edgeProblemIndex) > 1:
 
     fig = plt.figure()
 
-    plt.scatter(evaluationAxisArr[edgeProblemIndex[1]],chi2[edgeProblemIndex[1]])
+    plt.scatter(evaluationAxisArr[edgeProblemIndex[1]],np.amin(chi2[edgeProblemIndex[1]],1))
     plt.savefig('./TESTEP1Tau.png')
 
 fig = plt.figure()
@@ -249,11 +276,11 @@ fig = plt.figure()
 
 
 
-plt.scatter(evaluationAxisArr[0],chi2[0])
+plt.scatter(evaluationAxisArr[0],np.amin(chi2[0],1))
 plt.savefig('./TEST2Tau.png')
 
 fig = plt.figure()
 
 if len(highminvalueIndex) > 1:
-    plt.scatter(evaluationAxisArr[highminvalueIndex[0]],chi2[highminvalueIndex[0]])
+    plt.scatter(evaluationAxisArr[highminvalueIndex[0]],np.amin(chi2[highminvalueIndex[0]],1))
     plt.savefig('./TESTHM1Tau.png')

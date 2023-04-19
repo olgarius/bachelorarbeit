@@ -114,7 +114,7 @@ for i in range(10):
 
     def f2chi2(x,f2):
         tau2_e = np.sqrt((tau2_ex[i]+f2*met_x[i])**2+(tau2_ey[i]+f2*met_y[i])**2+tau2_ez[i]**2,dtype=np.float32)
-        return ((tau2_e-fac[i]/x)/TauE2_mes[i]*TAUERR)**2
+        return ((tau2_e-fac[i]/x)/(TauE2_mes[i]*TAUERR))**2
         
     def f3chi2(f1,f2):
         
@@ -122,7 +122,7 @@ for i in range(10):
         met = np.c_[met_x[i],met_y[i]]
         delta = met * f12[:,:,np.newaxis]
 
-        return np.einsum('ilj,ilj->il',delta, np.einsum('ji,klj->kli',invCovMat[i],delta),dtype=np.float32)
+        return np.einsum('ilj,ilj->il',delta, np.einsum('ji,klj->kli',invCovMat[i],delta))
 
     # def f3chi2(f1,f2):
     #     return (1-f1-f2)**2
@@ -210,3 +210,6 @@ for i in range(10):
 
 
     plo.scatter('/afs/desy.de/user/l/lukastim/code/bachelorarbeit/plots/tauTestPlots/', r"$\chi^2 \tau$-Fit Event "+str(i),r"$E_\tau^f$ in GeV",r"$\chi^2$-Value",(evaluationAxisTau1E,tempGrid2,'Event'+str(i)),(evaluationAxisTau1E[np.where(np.amin(tempGrid2)==tempGrid2)[0]][0],min(tempGrid2),r'$E_{\tau 1}^f$'), (TauE1_mes[i],min(tempGrid2),r'$E_{\tau 1}^m$'), (TauE1_gen[i],min(tempGrid2),r'$E_{\tau 1}^g$'),(fac[i]/TauE2_mes[i],min(tempGrid2),r'$E_{\tau 1}(E_{\tau 2}^m$)'),(fac[i]/TauE2_gen[i],min(tempGrid2),r'$E_{\tau 1}(E_{\tau 2}^g$)'),lim=xlim,yLim=ylim,alttitle='Chi2TauEvent'+str(i),s=8)
+
+    levels = np.append(np.array([np.amin(g.evaluated),np.amin(g.evaluated)+1]), np.linspace(np.amin(g.evaluated)+10,np.amax(g.evaluated),10))
+    plo.plot2d3( np.amin(g.evaluated,2),(evaluationAxisf,evaluationAxisTau1E), '/afs/desy.de/user/l/lukastim/code/bachelorarbeit/plots/tauTestPlots/', 'f1_' + str(i),'tau1_e_f',levels=levels)

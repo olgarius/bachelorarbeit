@@ -1,9 +1,11 @@
 import plotting 
 import structutil as su
+import datautil as du
 
 import matplotlib.pyplot as plt
 
 import numpy as np
+
 
 
 from PATHS import WORKINGDATAPATH
@@ -22,8 +24,9 @@ data2= np.load(WORKINGDATAPATH)
 
 
 
-be1fit = su.structToArray(data2,'fitdau1_e')
-be2fit = su.structToArray(data2,'fitdau2_e')
+tau1efit = su.structToArray(data2,'fitdau1_e')
+tau2efit = su.structToArray(data2,'fitdau2_e')
+
 
 
 
@@ -34,35 +37,106 @@ taue2gen = su.structToArray(data2,'genLepton2_e')
 fac = su.structToArray(data2,'tauie_to_tauje')
 genfac = su.structToArray(data2,'gentauie_to_gentauje')
 
+tau1phi = su.structToArray(data2,'dau1_phi')
+tau1eta = su.structToArray(data2,'dau1_eta')
+tau2eta = su.structToArray(data2,'dau2_eta')
+tau2phi = su.structToArray(data2,'dau2_phi')
 
+
+
+tau1phigen = su.structToArray(data2,'genLepton1_phi')
+tau1etagen = su.structToArray(data2,'genLepton1_eta')
 
 
 chi2sigma = su.structToArray(data2,'fitdau1_esigma')
 
 chi2val = su.structToArray(data2,'dau_chi2val')
 
+met = su.structToArray(data2,'met_et')
 
 
-
-pullFit1 = (be1fit-taue1gen)/taue1gen
+pullFit1 = (tau1efit-taue1gen)/taue1gen
 pullOriginal1 = (taue1 - taue1gen)/taue1gen
 
-pullFit2 = (be2fit-taue2gen)/taue2gen
+pullFit2 = (tau2efit-taue2gen)/taue2gen
 pullOriginal2 = (taue2 - taue2gen)/taue2gen
 
+print(np.mean(chi2sigma))
+print(np.mean(chi2sigma/tau1efit))
+print(len(np.where(chi2sigma==-1)[0])/len(chi2sigma))
+
+print('large pullvalues',np.where(pullFit1>1))
 
 
-plotting.plotHist(chi2sigma/be1fit,PATHTOPLOTSTAU,r"$\frac{\sigma_{\chi^2}}{E_{\tau 1}^f}$",r"$\sigma_{\chi^2}$-Distribution", [-0.15,2], 100,ylim=[0,20] ,alttitle='Tau_sigmaChi2DistributionNormed')
+plotting.plotHist(chi2sigma/tau1efit,PATHTOPLOTSTAU,r"$\frac{\sigma_{\chi^2}}{E_{\tau 1}^f}$",r"$\sigma_{\chi^2}$-Distribution", [-1.25,4], 100,ylim=[0.002,20] ,alttitle='Tau_sigmaChi2DistributionNormed',yscale='log')
 
 
-plotting.plotHist(chi2sigma,PATHTOPLOTSTAU,r"$\sigma_{\chi^2}$ in GeV",r"$\sigma_{\chi^2}$-Distribution", [-1.25,1000], 100,ylim=[0,0.1] ,alttitle='Tau_sigmaChi2Distribution')
+plotting.plotHist(chi2sigma,PATHTOPLOTSTAU,r"$\sigma_{\chi^2}$ in GeV",r"$\sigma_{\chi^2}$-Distribution", [-1.25,100], 100,ylim=[0.001,0.1] ,alttitle='Tau_sigmaChi2Distribution',yscale='log')
 
 plotting.plotHistCompare(PATHTOPLOTSTAU, r"Pull Value", r"Fitted vs. Measuerd $E_{\tau 1}$ Values", [-1,1.5], 100, (pullOriginal1, r"$\frac{E_{\tau 1}^{m}}{E_{\tau 1}^{g}}-1$ "),(pullFit1,r"$\frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1$ "),ylim=[0,2], alttitle='TauPullFitVsMeas')
 
 
 
-# plotting.plotHist(chi2val,PATHTOPLOTSTAU,r"$\chi^2$-Value",r"$\chi^2$-Value Distribution",xlim=[0,70], ylim =[0.005,0.1], yscale='log',bins=80, alttitle='Tau_Chi2ValueDistribution')
-plotting.plotHist(chi2val,PATHTOPLOTSTAU,r"$\chi^2$-Value",r"$\chi^2$-Value Distribution",xlim=[0,2], ylim =[0.0,10], bins=200, alttitle='Tau_Chi2ValueDistributionNonLog')
+plotting.plotHist(chi2val,PATHTOPLOTSTAU,r"$\chi^2$-Value",r"$\chi^2$-Value Distribution",xlim=[0,70], ylim =[0.005,0.1], yscale='log',bins=80, alttitle='Tau_Chi2ValueDistribution')
+plotting.plotHist(chi2val,PATHTOPLOTSTAU,r"$\chi^2$-Value",r"$\chi^2$-Value Distribution",xlim=[0,0.5], ylim =[0.0,10], bins=200, alttitle='Tau_Chi2ValueDistributionNonLog')
+
+v1m = (tau1eta,tau1phi)
+v1g = (tau1etagen,tau1phigen)
+v2m = (tau2eta,tau2phi)
+drmg = du.deltaR(v1m,v1g)
+dr12 = du.deltaR(v1m,v2m)
+
+deta12 = abs(tau1eta-tau2eta)
+dphi12 = np.minimum(abs(tau1phi-tau2phi),abs(2*np.pi - tau1phi-tau2phi))
+
+
+
+
+maxeta = np.where(np.greater(np.absolute(tau1eta),np.absolute(tau2eta)), tau1eta,tau2eta)
+
+
+indexPullFit1greater0d5 = np.where(pullFit1>0.5)[0]
+indexPullFitPeak1 = np.where(np.logical_and(pullFit1>=1,pullFit1<=1.025))[0]
+indexPullFitPeak2 = np.where(np.logical_and(pullFit1>=-0.5,pullFit1<=-0.475))[0]
+
+print((len(indexPullFitPeak1)+len(indexPullFitPeak2)))
+print((len(indexPullFitPeak1)+len(indexPullFitPeak2))/len(pullFit1)*100)
+# print(list(zip(np.take(tau1efit,indexPullFitPeak1),np.take(taue1gen,indexPullFitPeak1))))
+
+
+dau1phivsetaCut = (np.take(tau1phi,indexPullFit1greater0d5),np.take(tau1eta,indexPullFit1greater0d5),r"$(\phi, \eta) $ for $ \frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1 > 0.5 $") 
+dau1phivseta = (tau1phi,tau1eta,r"$(\phi, \eta) $")
+plotting.scatter(PATHTOPLOTSTAU, 'Comparison for high Pullvalues', r'$\phi$', r'$\eta$',dau1phivsetaCut, lim=[-np.pi,np.pi], yLim=[-5,5])
+
+plotting.plotHistCompare(PATHTOPLOTSTAU,r"$\eta$", "Eta for high Pullvalues", [-5,5],100, (np.take(tau1eta,indexPullFit1greater0d5),r"$\eta $ for $ \frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1 > 0.5 $   "),(tau1eta,r"$\eta$      "), yLabel='Amount', density=False, ylim=[0,1000])
+plotting.plotHistCompare(PATHTOPLOTSTAU,r"$\Delta r(\tau^{m,g}))$", "Delta r tau gm for high Pullvalues", [0,0.1],100, (np.take(drmg,indexPullFit1greater0d5),r"$\Delta r$ for $ \frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1 > 0.5 $   "),(drmg,r"$\Delta r$      "), yLabel='Amount', density=False, ylim=[0,1000])
+plotting.plotHistCompare(PATHTOPLOTSTAU,r"max $\eta$", "max Eta for high Pullvalues", [-5,5],100, (np.take(maxeta,indexPullFit1greater0d5),r"max $\eta $ for $ \frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1 > 0.5 $   "),(maxeta,r"max $\eta$      "), yLabel='Amount', density=False, ylim=[0,1000])
+plotting.plotHistCompare(PATHTOPLOTSTAU,r"$\Delta r(\tau_{1,2}))$", "Delta r tau 12 for high Pullvalues", [0,2.5],100, (np.take(dr12,indexPullFit1greater0d5),r"$\Delta r$ for $ \frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1 > 0.5 $   "),(dr12,r"$\Delta r$      "), yLabel='Amount', density=False, ylim=[0,1000])
+plotting.plotHistCompare(PATHTOPLOTSTAU,r"$\Delta \eta(\tau_{1,2}))$", "Delta eta for high Pullvalues", [0,4],100, (np.take(deta12,indexPullFit1greater0d5),r"$\Delta \eta$ for $ \frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1 > 0.5 $   "),(deta12,r"$\Delta \eta$      "), yLabel='Amount', density=False, ylim=[0,1000])
+plotting.plotHistCompare(PATHTOPLOTSTAU,r"$\Delta \phi(\tau_{1,2}))$", "Delta phi for high Pullvalues", [0,3.5],100, (np.take(dphi12,indexPullFit1greater0d5),r"$\Delta \phi$ for $ \frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1 > 0.5 $   "),(dphi12,r"$\Delta \phi$      "), yLabel='Amount', density=False, ylim=[0,1000])
+plotting.plotHistCompare(PATHTOPLOTSTAU,r"missing $E_T$", "met for high Pullvalues", [0,300],100, (np.take(met,indexPullFit1greater0d5),r"missing $E_T$ for $ \frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1 > 0.5 $   "),(met,r"missing $E_T$      "), yLabel='Amount', density=False, ylim=[0,1000])
+
+
+
+frac = taue1/taue1gen
+
+plotting.plotHistCompare(PATHTOPLOTSTAU,r"$\frac{E_{\tau1}^{m}}{E_{\tau1}^{g}}$", "Visible fraction for high Pullvalues", [0,2],100, (np.take(frac,indexPullFit1greater0d5),r"Visible Fraction for $ \frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1 > 0.5 $   "),(frac,r"Visible Fraction     "), yLabel='Amount', density=False, ylim=[0,1000])
+
+
+plotting.binCompare(PATHTOPLOTSTAU,np.take(tau1eta,indexPullFit1greater0d5),tau1eta,'test','BinContentComparisonEta',[-5,5],100, label= r"$\log \frac{\mathrm{bin\;content\; of\; } \eta \mathrm{\;for\;}  \frac{E_{\tau 1}^{f}}{E_{\tau 1}^{g}}-1 > 0.5   }{\mathrm{bin\; content\; of\; } \eta}$" )
+
+plotting.binCompare(PATHTOPLOTSTAU,np.take(frac,indexPullFit1greater0d5),frac,'test','BinContentComparisonVisibleFrac',[0,2],100)
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -40,17 +40,40 @@ mins = []
 sigmaFits = []
 minpos = []
 
-tau1_ex = su.structToArray(events,'dau1_ex')
-tau1_ey = su.structToArray(events,'dau1_ey')
-tau1_ez = su.structToArray(events,'dau1_ez')
+# tau1_ex = su.structToArray(events,'dau1_ex')
+# tau1_ey = su.structToArray(events,'dau1_ey')
+# tau1_ez = su.structToArray(events,'dau1_ez')
 
-tau2_ex = su.structToArray(events,'dau2_ex')
-tau2_ey = su.structToArray(events,'dau2_ey')
-tau2_ez = su.structToArray(events,'dau2_ez')
+# tau2_ex = su.structToArray(events,'dau2_ex')
+# tau2_ey = su.structToArray(events,'dau2_ey')
+# tau2_ez = su.structToArray(events,'dau2_ez')
 
-met_x = su.structToArray(events,'met_x')
-met_y = su.structToArray(events,'met_y')
+# met_x = su.structToArray(events,'met_x')
+# met_y = su.structToArray(events,'met_y')
 
+# TauE1_mes = su.structToArray(events,'dau1_e') 
+# TauE2_mes = su.structToArray(events,'dau2_e') 
+
+# fac = su.structToArray(events,'tauie_to_tauje')
+
+# Debug:
+ax = 'debug/'
+
+tau1_ex = su.structToArray(events,'debugdau1_ex')
+tau1_ey = su.structToArray(events,'debugdau1_ey')
+tau1_ez = su.structToArray(events,'debugdau1_ez')
+
+tau2_ex = su.structToArray(events,'debugdau2_ex')
+tau2_ey = su.structToArray(events,'debugdau2_ey')
+tau2_ez = su.structToArray(events,'debugdau2_ez')
+
+met_x = su.structToArray(events,'debugmet_x')
+met_y = su.structToArray(events,'debugmet_y')
+
+TauE1_mes = su.structToArray(events,'debugdau1_e') 
+TauE2_mes = su.structToArray(events,'debugdau2_e') 
+
+fac = su.structToArray(events,'gentauie_to_gentauje')
 
 
 
@@ -58,15 +81,19 @@ TauE1_gen = su.structToArray(events,'genLepton1_e')
 TauE2_gen = su.structToArray(events,'genLepton2_e') 
 
 
-TauE1_mes = su.structToArray(events,'dau1_e') 
-TauE2_mes = su.structToArray(events,'dau2_e') 
+
+
+
+
+
+
 # TauE1_eta = su.structToArray(events,'dau1_eta') 
 # TauE2_eta = su.structToArray(events,'dau2_eta') 
 # TauE1_phi = su.structToArray(events,'dau1_phi') 
 # TauE2_phi = su.structToArray(events,'dau2_phi')
 
 TauHM_mes = su.structToArray(events,'tauH_mass')
-fac = su.structToArray(events,'tauie_to_tauje')
+
 indices = su.structToArray(events, 'index')
 invCovMat = du.combineArrayToMatrixArray(events['met_invcov00'], events['met_invcov01'], events['met_invcov01'], events['met_invcov11'])
 
@@ -89,17 +116,27 @@ highminvalueIndex = []
 
 chi2dicts = [] 
 
-for i in range(10):
+for i in [128,   233,   349]:
    
     start= time.perf_counter()
 
     def fitfunc(x):
         return fac[i]/x
 
-    # evaluationAxisTau1E = np.linspace(EPSILON*TauE1_mes[i],MHIGGS**2/TauHM_mes[i]**2 * 1/EPSILON*TauE1_mes[i],100)
+    # evaluationAxisTau1E = np.linspace(EPSILON*TauE1_mes[i],MHIGGS**2/TauHM_mes[i]**2 * 1/EPSILON*TauE1_mes[i],100) # ax1
+    # ax = 'ax1/'
+
     evaluationAxisTau1E = mu.axisValueTransformToMu1Mu2(unitAxis[0],TauE1_mes[i], TauE2_mes[i], TAUERR*TauE1_mes[i], TAUERR*TauE2_mes[i],fitfunc,3)
+    # ax = 'ax2/'
+    
     # evaluationAxisTau1E = np.linspace(TauE1_mes[i]-EPSILON2,MHIGGS**2/TauHM_mes[i]**2 * TauE1_mes[i]*TauE2_mes[i] /(TauE2_mes[i]-EPSILON2),100)
+    # ax = 'ax3/'
+
+
     # evaluationAxisTau1E = np.linspace(TauE1_mes[i],fac[i]/(0.99*TauE2_mes[i]),100)
+    # ax = 'ax4/'
+    
+
     # print(evaluationAxisTau1E)
 
     evaluationAxisf = np.linspace(0,1,101)
@@ -107,14 +144,15 @@ for i in range(10):
 
     evaluationAxisArr.append(evaluationAxisTau1E)
     
+    
     def f1chi2(x,f1):
-        tau1_e = np.sqrt((tau1_ex[i]+f1*met_x[i])**2+(tau1_ey[i]+f1*met_y[i])**2+tau1_ez[i]**2)
+        tau1_e = np.sqrt((tau1_ex[i]+f1*met_x[i])**2+(tau1_ey[i]+f1*met_y[i])**2+tau1_ez[i]**2,dtype=np.float32)
         return ((tau1_e-x)/(TAUERR*TauE1_mes[i]))**2
 
-
+    
     def f2chi2(x,f1):
-        tau2_e = np.sqrt((tau2_ex[i]+(1-f1)*met_x[i])**2+(tau2_ey[i]+(1-f1)*met_y[i])**2+tau2_ez[i]**2)
-        return ((tau2_e-fac[i]/x)/TauE2_mes[i]*TAUERR)**2
+        tau2_e = np.sqrt((tau2_ex[i]+(1-f1)*met_x[i])**2+(tau2_ey[i]+(1-f1)*met_y[i])**2+tau2_ez[i]**2,dtype=np.float32)
+        return ((tau2_e-fac[i]/x)/(TauE2_mes[i]*TAUERR))**2
         
    
 
@@ -194,10 +232,33 @@ for i in range(10):
     print('Time Elapsed: ', time.perf_counter()-start)
 
     xdelta = evaluationAxisTau1E[99]-evaluationAxisTau1E[0]
-    xlim = [evaluationAxisTau1E[0] -0.1*xdelta,evaluationAxisTau1E[99] + 0.1*xdelta]
+ 
+
+    
+
+    
+    xlim1 = [evaluationAxisTau1E[0] -0.1*xdelta,evaluationAxisTau1E[99] + 0.1*xdelta]
 
     ydelta = max(tempGrid2)-min(tempGrid2)
-    ylim= [min(tempGrid2)-0.1*ydelta,max(tempGrid2)+0.1*ydelta]
+    ylim1= [min(tempGrid2)-0.1*ydelta,max(tempGrid2)+0.1*ydelta]
 
 
-    plo.scatter('/afs/desy.de/user/l/lukastim/code/bachelorarbeit/plots/tauTestPlots2/', r"$\chi^2 \tau$-Fit Event "+str(i),r"$E_\tau^f$ in GeV",r"$\chi^2$-Value",(evaluationAxisTau1E,tempGrid2,'Event'+str(i)),(evaluationAxisTau1E[np.where(np.amin(tempGrid2)==tempGrid2)[0]][0],min(tempGrid2),r'$E_{\tau 1}^f$'), (TauE1_mes[i],min(tempGrid2),r'$E_{\tau 1}^m$'), (TauE1_gen[i],min(tempGrid2),r'$E_{\tau 1}^g$'),(fac[i]/TauE2_mes[i],min(tempGrid2),r'$E_{\tau 1}(E_{\tau 2}^m$)'),(fac[i]/TauE2_gen[i],min(tempGrid2),r'$E_{\tau 1}(E_{\tau 2}^g$)'),lim=xlim,yLim=ylim,alttitle='Chi2TauEvent'+str(i),s=8)
+    plo.scatter('/afs/desy.de/user/l/lukastim/code/bachelorarbeit/plots/tauTestPlots2/'+ax, r"$\chi^2 \tau$-Fit Event "+str(i),r"$E_\tau^f$ in GeV",r"$\chi^2$-Value",(evaluationAxisTau1E,tempGrid2,'Event'+str(i)),(evaluationAxisTau1E[np.where(np.amin(tempGrid2)==tempGrid2)[0]][0],min(tempGrid2),r'$E_{\tau 1}^f$'), (TauE1_mes[i],min(tempGrid2),r'$E_{\tau 1}^m$'), (TauE1_gen[i],min(tempGrid2),r'$E_{\tau 1}^g$'),(fac[i]/TauE2_mes[i],min(tempGrid2),r'$E_{\tau 1}(E_{\tau 2}^m$)'),(fac[i]/TauE2_gen[i],min(tempGrid2),r'$E_{\tau 1}(E_{\tau 2}^g$)'),lim=xlim1,yLim=ylim1,alttitle='Chi2TauEvent_'+str(i),s=100)
+    
+    impxVals = np.where(tempGrid2 < 10)[0]
+
+    if len(impxVals) > 0:
+
+        ylim = [-1,10]
+        delta2x = evaluationAxisTau1E[impxVals[-1]] - evaluationAxisTau1E[impxVals[0]]
+
+        xlim =  [evaluationAxisTau1E[impxVals[0]] - 0.1* delta2x, evaluationAxisTau1E[impxVals[-1]]+0.1 *delta2x]
+
+
+        plo.scatter('/afs/desy.de/user/l/lukastim/code/bachelorarbeit/plots/tauTestPlots2/'+ax, r"$\chi^2 \tau$-Fit Event "+str(i),r"$E_\tau^f$ in GeV",r"$\chi^2$-Value",(evaluationAxisTau1E,tempGrid2,'Event'+str(i)),(evaluationAxisTau1E[np.where(np.amin(tempGrid2)==tempGrid2)[0]][0],min(tempGrid2),r'$E_{\tau 1}^f$'), (TauE1_mes[i],min(tempGrid2),r'$E_{\tau 1}^m$'), (TauE1_gen[i],min(tempGrid2),r'$E_{\tau 1}^g$'),(fac[i]/TauE2_mes[i],min(tempGrid2),r'$E_{\tau 1}(E_{\tau 2}^m$)'),(fac[i]/TauE2_gen[i],min(tempGrid2),r'$E_{\tau 1}(E_{\tau 2}^g$)'),lim=xlim,yLim=ylim,alttitle='Chi2TauEvent_ylim10_'+str(i),s=100)
+
+    
+    levels = np.append(np.array([np.amin(g.evaluated),np.amin(g.evaluated)+1]), np.linspace(np.amin(g.evaluated)+10,np.amax(g.evaluated),10))
+    plo.plot2d3( g.evaluated,(evaluationAxisf,evaluationAxisTau1E), '/afs/desy.de/user/l/lukastim/code/bachelorarbeit/plots/tauTestPlots2/'+ax, 'f1_' + str(i),'tau1_e_f',levels=levels)
+
+print(sigmaFits)
