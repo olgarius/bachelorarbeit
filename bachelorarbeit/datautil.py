@@ -40,7 +40,7 @@ def getSigmas(data, ptKey, etaKey, NSCtable, rhokey=None,):
                 sigmabool = True
                 break
         if sigmabool:
-            sigma = mu.sigmaBjetAcc(pt,n,c,s,d)
+            sigma = mu.sigmaBjetAcc(pt,n,s,c,d)
         else:
             sigma = 0.1 * pt
             wc += 1

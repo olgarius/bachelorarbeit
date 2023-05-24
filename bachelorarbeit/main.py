@@ -29,11 +29,12 @@ chi2str =[]
 mins = []
 sigmaFits = []
 minpos = []
+edgeProblemBool = []
 
 BE1_mes = su.structToArray(events,'bjet1_e') 
 BE2_mes = su.structToArray(events,'bjet2_e') 
-BE1sigma = su.structToArray(events, 'bjet1_sigma')
-BE2sigma = su.structToArray(events, 'bjet2_sigma')
+BE1sigma = su.structToArray(events, 'bjet1_sigma') * BE1_mes
+BE2sigma = su.structToArray(events, 'bjet2_sigma') * BE2_mes
 fac = su.structToArray(events,'bie_to_bje')
 indices = su.structToArray(events, 'index')
 
@@ -62,7 +63,7 @@ for i, n in enumerate(be1functions):
 
 
     # evaluationAxis = util.axisValueTransformToMu(unitAxis[0],BE1_mes[i],BE1sigma[i],6)
-    evaluationAxis = mathutil.axisValueTransformToMu1Mu2(unitAxis[0],BE1_mes[i], BE2_mes[i], BE1sigma[i], BE1sigma[i],be2fitfunctions[i],3)
+    evaluationAxis = mathutil.axisValueTransformToMu1Mu2(unitAxis[0],BE1_mes[i], BE2_mes[i], BE1sigma[i], BE2sigma[i],be2fitfunctions[i],3)
     # evaluationAxis = unitAxis[0]*300
     evaluationAxisArr.append(evaluationAxis)
     evaluationAxisArrstr.append(json.dumps(evaluationAxis.tolist()))
@@ -84,6 +85,9 @@ for i, n in enumerate(be1functions):
         edgeProblem.append(g.evaluated)
         edgeProblemAxis.append(evaluationAxis)
         edgeProblemIndex.append(i)
+        edgeProblemBool.append(True)
+    else:
+        edgeProblemBool.append(False)
 
 
     chi2.append(g.evaluated)
@@ -100,11 +104,28 @@ for i, n in enumerate(be1functions):
 
     def f(x):
         return n(x)+be2functions[i](x)-minvalue-1
-    root1 = sopt.fsolve(f,evaluationAxis[0])
-    root2 = sopt.fsolve(f,evaluationAxis[99])
+    # root1 = sopt.fsolve(f,evaluationAxis[0])
+    # root2 = sopt.fsolve(f,evaluationAxis[99])
 
 
-    sigmaFit = root2[0]-root1[0] 
+    # sigmaFit = root2[0]-root1[0] 
+
+
+    maxi = 2*evaluationAxis[mp[0]]
+    while f(maxi) < 0:
+        maxi = maxi*2
+    mini = 0.5*evaluationAxis[mp[0]]
+    while f(mini) < 0:
+        mini = mini/2
+
+    root1 = sopt.brentq(f,mini,evaluationAxis[mp[0]])
+    root2 = sopt.brentq(f,evaluationAxis[mp[0]],maxi)
+
+    # print(i, root1, root2, mp[0], f(evaluationAxis[mp[0]]))
+
+    sigmaFit = (root2  -root1)/2
+
+
 
     if sigmaFit < 0:
         counterNegSigma +=1
@@ -129,7 +150,8 @@ su.updateDataSet(WORKINGDATAPATH,'fitbjet1_e', mins)
 su.updateDataSet(WORKINGDATAPATH,'fitbjet2_e',fac/mins)
 su.updateDataSet(WORKINGDATAPATH,'chi2val', minvalues)
 su.updateDataSet(WORKINGDATAPATH,'fitbjet1_esigma',sigmaFits)
-su.updateDataSet(WORKINGDATAPATH, 'chi2dict', chi2dicts)
+su.updateDataSet(WORKINGDATAPATH,'chi2dict', chi2dicts)
+su.updateDataSet(WORKINGDATAPATH,'bfit_valueOnEdge',edgeProblemBool)
 
 
 print('EP indices: ',edgeProblemIndex)
