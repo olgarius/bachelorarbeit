@@ -10,6 +10,8 @@ bachelorarbeit/__pycache__
 
 **/*.png
 *.png
+*.pdf
+
 
 bachelorarbeit/Fehlerellipse.py
 bachelorarbeit/EventValidation.py
