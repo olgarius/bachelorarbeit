@@ -27,7 +27,7 @@ for i,f in enumerate(files):
 
 # events =  np.load(path)['events']
 
-print(len(events))
+print('Size of rawdata:', len(events))
 
 relevantData = events[relevantKeys]
 
@@ -57,6 +57,10 @@ TauSwitchList = (('dau2_e','dau1_e'),('dau2_eta','dau1_eta'),('dau2_phi','dau1_p
 dataSet, notuseableEvents = du.deltaRmatching(repackedData, 'bjet1_eta','bjet2_eta', 'bjet1_phi','bjet2_phi' ,'genBQuark1_eta','genBQuark2_eta', 'genBQuark1_phi','genBQuark2_phi', BquarkSwitchList )
 dataSet, notuseableEvents2 = du.deltaRmatching(dataSet, 'dau1_eta','dau2_eta', 'dau1_phi','dau2_phi' ,'genLepton1_eta','genLepton2_eta', 'genLepton1_phi','genLepton2_phi', TauSwitchList )
 
+print('no match delta R b: ',len(notuseableEvents), len(notuseableEvents)/len(events)*100, '%')
+print('no match delta R tau: ',len(notuseableEvents2),len(notuseableEvents2)/len(events)*100, '%')
+
+
 notuseableEvents += notuseableEvents2
 # print(set(notuseableEvents1) == set(notuseableEvents))
 
@@ -66,14 +70,23 @@ notuseableEvents += notuseableEvents2
 
 # notuseableEvents += su.getIndexForCondition(dataSet, 'genBQuark1_pt', np.less, 40)
 # notuseableEvents += su.getIndexForCondition(dataSet, 'genBQuark2_pt', np.less, 40)
-notuseableEvents += su.getIndexForCondition(dataSet, 'nbjetscand', np.less, 1)
+
+l0 = len(notuseableEvents)
+notuseableEvents += su.getIndexForCondition(dataSet, 'nbjetscand', np.less_equal, 1)
+l1 = len(notuseableEvents) - l0
 notuseableEvents += su.getIndexForCondition(dataSet, 'bjet1_btag_deepFlavor', np.less, 0.304)
+l2 = len(notuseableEvents) - l0 -l1
 notuseableEvents += su.getIndexForCondition(dataSet, 'bjet2_btag_deepFlavor', np.less, 0.304)
+l3 = len(notuseableEvents) - l0 -l1 - l2
 notuseableEvents += su.getIndexForCondition(dataSet, 'pairType', np.greater, 2)
+l4 = len(notuseableEvents) - l0 -l1 - l2 -l3
 
 
-
-
+print('not enough b jets: ', l1,l1/len(events)*100, '%')
+print('not sure enough b jets 1: ', l2,l2/len(events)*100, '%')
+print('not sure enough b jets 2: ', l3,l3/len(events)*100, '%')
+print('to many neutrinos: ', l4,l4/len(events)*100, '%')
+print(len(set(notuseableEvents)), len(set(notuseableEvents))/len(events)*100, '%')
 dataSet = su.removeEvents(dataSet,notuseableEvents)
 
 
@@ -118,13 +131,13 @@ debugNu2_ex , debugNu2_ey , debugNu2_ez  = mu.detCoordinatesToCartesian((su.stru
 
 debugTau1_ex = debugTau1_exComplete - debugNu1_ex
 debugTau1_ey = debugTau1_eyComplete - debugNu1_ey
-debugTau1_ez = debugTau1_exComplete - debugNu1_ez
+debugTau1_ez = debugTau1_ezComplete - debugNu1_ez
 
 debugTau1_e = su.structToArray(dataSet,'genLepton1_e')-su.structToArray(dataSet,'genNu1_e')
 
 debugTau2_ex = debugTau2_exComplete - debugNu2_ex
 debugTau2_ey = debugTau2_eyComplete - debugNu2_ey
-debugTau2_ez = debugTau2_exComplete - debugNu2_ez
+debugTau2_ez = debugTau2_ezComplete - debugNu2_ez
 
 debugTau2_e = su.structToArray(dataSet,'genLepton2_e')-su.structToArray(dataSet,'genNu2_e')
 
