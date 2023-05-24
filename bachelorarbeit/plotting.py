@@ -2,6 +2,8 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolor
+from matplotlib.lines import Line2D
+
 import mplhep as hep
 
 from collections.abc import Iterable
@@ -217,9 +219,9 @@ def plot1v2hist(x,y, expectedxy, expectedlabel, xlim, ylim, bins, xlabel, ylabel
 
     plt.rcParams["text.usetex"] = False
 
-def plotHistCompare(path, xLabel, title, xlim, bins,*x, yLabel= r"Normalized Denisty", ylim=[0,1], density=True, xscale='linear', yscale='linear', alttitle = None):
+def plotHistCompare(path, xLabel, title, xlim, bins,*x, comparefunctions=[], yLabel= r"Normalized Denisty", ylim=[0,1], density=True, xscale='linear', yscale='linear', pdf=False, alttitle = None):
     fig = plt.figure()
-  
+    ax = plt.gca()
 
     plt.rcParams["text.usetex"] = True
 
@@ -228,11 +230,44 @@ def plotHistCompare(path, xLabel, title, xlim, bins,*x, yLabel= r"Normalized Den
 
 
     for xc in x:
-        mean2 = np.mean(xc[0])
-        std2 = np.std(xc[0])
-        label  = xc[1] +r"$\mu = $" + str(round(mean2,2)) + r" $\sigma = $" + str(round(std2,2))
-        plt.hist(xc[0],bins,range=tuple(xlim),density=density,histtype=u'step', label=label, linewidth=3)
-    plt.legend(fontsize=15, loc = 1)
+        mean2 = np.quantile(xc[0],0.5)
+        std2d = np.quantile(xc[0],0.16)
+        std2u = np.quantile(xc[0],0.84)
+        # label = xc[1] + r'  $\mu = {{{median}}}^{{{up}}}_{{{down}}}$'.format(median=str(round(mean2,2)),up=str(round(std2u,2)),down=str(round(std2d,2)))
+        label = xc[1] + r'  $\mu = '+ str(round(mean2,2)) + r'^{+'+ str(round(std2u-mean2,2)) + r'}_{-' + str(round(mean2-std2d,2))+ r'}$'
+
+
+        n,b,p  = plt.hist(xc[0],bins,range=tuple(xlim),density=density,histtype=u'step', label=label, linewidth=3)
+
+        iu = n[np.argmax(b>std2u)-1]
+        im = n[np.argmax(b>mean2)-1]
+        id = n[np.argmax(b>std2d)-1]
+
+        c =p[-1].get_edgecolor()
+       
+        plt.vlines(std2u,0,iu, color= c, ls=':', alpha=0.5)
+        plt.vlines(mean2,0,im, color= c, ls='--', alpha=0.5)
+        plt.vlines(std2d,0,id, color= c, ls=':', alpha=0.5)
+
+    for f in comparefunctions:
+        x = np.linspace(xlim[0],xlim[1],1000)
+        y = f[0](x)
+        plt.plot(x,y,label=f[1], marker='')
+
+
+    plotted_handles, plotted_labels = ax.get_legend_handles_labels()
+    custom_handles = []
+    custom_labels = []
+
+    custom_handles.append(Line2D([0], [0], color='grey', lw=2, ls='--', marker= ''))
+    custom_labels.append('median')
+    
+    custom_handles.append(Line2D([0], [0], color='grey', lw=2, ls=':',marker= ''))
+    custom_labels.append('68\% quantile')
+
+    final_handles = plotted_handles + custom_handles
+    final_labels = plotted_labels + custom_labels
+    ax.legend(final_handles, final_labels,fontsize=20, loc = 1)
 
     plt.xlim(xlim)
     plt.ylim(ylim)
@@ -251,11 +286,17 @@ def plotHistCompare(path, xLabel, title, xlim, bins,*x, yLabel= r"Normalized Den
         title =alttitle
 
     plt.savefig(path + title)
+
+    if pdf:
+        plt.savefig(path + title + '.pdf')
+
     plt.rcParams["text.usetex"] = False
 
 
 def scatter(path, title, xlabel, ylabel, *x, lim=[0,300], alttitle= None, yLim=None,s=2):
-    fig,ax  = plt.subplots(figsize = (10,10))
+    fig, ax  = plt.subplots(figsize = (10,10))
+    
+
     plt.rcParams["text.usetex"] = True
 
     colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]

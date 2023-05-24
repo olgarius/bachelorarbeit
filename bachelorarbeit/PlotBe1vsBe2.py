@@ -23,6 +23,17 @@ be1gen = su.structToArray(data2,'genBQuark1_e')
 be2gen = su.structToArray(data2,'genBQuark2_e')
 fac = su.structToArray(data2,'bie_to_bje')
 genfac = su.structToArray(data2,'genbie_to_genbje')
+sigma = su.structToArray(data2,'bjet1_sigma')
+nbjetscand = su.structToArray(data2,'nbjetscand')
+bjet1DF = su.structToArray(data2,'bjet1_btag_deepFlavor')
+bjet2DF = su.structToArray(data2,'bjet2_btag_deepFlavor')
+rho = su.structToArray(data2,'rho')
+eta = su.structToArray(data2,'bjet1_eta')
+phi = su.structToArray(data2,'bjet1_phi')
+met_et =  su.structToArray(data2,'met_et')
+
+
+
 
 
 chi2val = su.structToArray(data2,'chi2val')
@@ -71,16 +82,20 @@ fxx = np.append(fy,fx)
 fyy = np.append(fx,fy)
 f = [fxx,fyy]
 
-plotting.plot1v2hist(be1fitdfac,be2fitdfac, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{fit}}{f}$",r"$\frac{E_{B2}^{fit}}{f}$",r" $E_{B2}^{fit}$ vs $ E_{B2}^{fit}$ ", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha)})}}$",'SanityCheck')
+# plotting.plot1v2hist(be1fitdfac,be2fitdfac, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{fit}}{f}$",r"$\frac{E_{B2}^{fit}}{f}$",r" $E_{B2}^{fit}$ vs $ E_{B2}^{fit}$ ", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha)})}}$",'SanityCheck')
 
 
-plotting.plot1v2hist(be1dfac,be2dfac, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ ", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(alpha)})}}$",'BE1vsBE2')
-plotting.plot1v2hist(be1dfacComp0d5,be2dfacComp0d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100,r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ for $\chi^2 < 0.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'BE1vsBE2Chi2smaller0d5')
-plotting.plot1v2hist(be1dfacComp2d5,be2dfacComp2d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ for $\chi^2 < 2.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'BE1vsBE2Chi2smaller2d5')
-plotting.plot1v2hist(be1dfacComp10,be2dfacComp10, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100,  r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ for $\chi^2 < 10$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'BE1vsBE2Chi2smaller10')
+# plotting.plot1v2hist(be1dfac,be2dfac, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ ", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(alpha)})}}$",'BE1vsBE2')
+# plotting.plot1v2hist(be1dfacComp0d5,be2dfacComp0d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100,r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ for $\chi^2 < 0.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'BE1vsBE2Chi2smaller0d5')
+# plotting.plot1v2hist(be1dfacComp2d5,be2dfacComp2d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ for $\chi^2 < 2.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'BE1vsBE2Chi2smaller2d5')
+# plotting.plot1v2hist(be1dfacComp10,be2dfacComp10, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100,  r"$\frac{E_{B2}^{meas}}{f}$",r"$\frac{E_{B2}^{meas}}{f}$",r" $E_{B2}^{meas}$ vs $ E_{B2}^{meas}$ for $\chi^2 < 10$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'BE1vsBE2Chi2smaller10')
 
-plotting.plot1v2hist(be1gendfac,be2gendfac, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ ", PATHTOPLOTSDATVAL, r" $f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(alpha)})}}$",'genBE1vsBE2')
-plotting.plot1v2hist(be1gendfacComp0d5,be2gendfacComp0d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ for $\chi^2 < 0.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'genBE1vsBE2Chi2smaller0d5')
-plotting.plot1v2hist(be1gendfacComp2d5,be2gendfacComp2d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ for $\chi^2 < 2.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'genBE1vsBE2Chi2smaller2d5')
-plotting.plot1v2hist(be1gendfacComp10,be2gendfacComp10, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ for $\chi^2 < 10$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'genBE1vsBE2Chi2smaller10')
+# plotting.plot1v2hist(be1gendfac,be2gendfac, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ ", PATHTOPLOTSDATVAL, r" $f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(alpha)})}}$",'genBE1vsBE2')
+# plotting.plot1v2hist(be1gendfacComp0d5,be2gendfacComp0d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ for $\chi^2 < 0.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'genBE1vsBE2Chi2smaller0d5')
+# plotting.plot1v2hist(be1gendfacComp2d5,be2gendfacComp2d5, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ for $\chi^2 < 2.5$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'genBE1vsBE2Chi2smaller2d5')
+# plotting.plot1v2hist(be1gendfacComp10,be2gendfacComp10, f,r"$y=\frac{1}{x}$",[0,10],[0,10], 100, r"$\frac{E_{B2}^{gen}}{f}$",r"$\frac{E_{B2}^{gen}}{f}$",r" $E_{B2}^{gen}$ vs $ E_{B2}^{gen}$ for $\chi^2 < 10$", PATHTOPLOTSDATVAL, r"$f = \sqrt{\frac{m_H²}{2 \cdot (1-\cos{(\alpha}))}}$",'genBE1vsBE2Chi2smaller10')
 
+
+
+
+plotting.plot1v2hist(chi2val,met_et,[0,0],r'not important',[0,10],[0,300],100,r'$\chi^2$',r"MET",'Chi2VsMETComparsion',PATHTOPLOTSDATVAL,r'whut?' )
